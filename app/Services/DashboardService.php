@@ -34,6 +34,8 @@ class DashboardService
             'tasksAll'      => Todo::where('user_id', $user->id)->get(),
             'siteSettings' => Website_settings::first(),
             'requests' => WantToJoin::all(),
+            'listProjects' => Projects::where('user_id', $user->id)->latest()->get(),
+            
         ];
     }
 }

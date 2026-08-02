@@ -5,18 +5,18 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Projects;
-use App\Models\User;
+use App\Services\DashboardService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
 
 class ProjectController extends Controller
 {
-    public function index()
+    public function index(DashboardService $service)
     {
-        $user = Auth::user();
+        $data = $service->getStats(Auth::user());
 
-        return view('admin.projects.add', compact('user'));
+        return view('admin.projects.add', $data);
     }
     public function store(Request $request)
     {
@@ -52,11 +52,11 @@ class ProjectController extends Controller
         return redirect()->route('ist.project')->with('success', 'Project Updated Successfully!');
     }
 
-    public function list()
+    public function list(DashboardService $service)
     {
-        $user = Auth::user();
-        $projects = Projects::where('user_id', Auth::user()->id)->latest()->get();
-        return view('admin.projects.list', compact('user', 'projects'));
+             $data   = $service->getStats(Auth::user());
+
+        return view('admin.projects.list', $data);
     }
 
     public function edit($slug){

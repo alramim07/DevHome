@@ -15,4 +15,14 @@ class TeamRequest extends Controller
         $requests = $service->getStats(Auth::user());
         return view('admin.team-request', $requests);
     }
+
+    public function destroy($id)
+    {
+        $request = WantToJoin::find($id);
+        if (!$request) {
+            return response()->json(['success' => false, 'message' => 'Request not found']);
+        }
+        $request->delete();
+        return response()->json(['success' => true, 'message' => 'Request deleted successfully']);
+    }
 }

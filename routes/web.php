@@ -95,4 +95,5 @@ Route::middleware('auth')->group(function () {
     Route::delete('/todo/delete/{id}', [TodoController::class, 'destroy'])->name('todo.delete');
 
     Route::get('/join-list', [TeamRequest::class, 'index'])->name('join.list');
+    Route::delete('/join-delete/{id}', [TeamRequest::class, 'destroy'])->name('join.delete');
 });
