@@ -49,7 +49,7 @@ class ProjectController extends Controller
         }
 
         $project->save();
-        return redirect()->route('ist.project')->with('success', 'Project Updated Successfully!');
+        return redirect()->route('list.project')->with('success', 'Project Updated Successfully!');
     }
 
     public function list(DashboardService $service)
