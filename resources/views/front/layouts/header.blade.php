@@ -40,16 +40,16 @@
             <a href="{{ route('home') }}" class="zh mj _i nj" :class="{'bi' :page === 'home'}">Home</a>
           </li>
           <li class="nav__menu sm" :class="{ 'tm' : stickyMenu }">
-            <a href="/#about" class="zh mj _i nj">About Us</a>
+            <a href="/#about" class="zh mj _i nj" :class="{'bi' :page === 'about'}">About Us</a>
           </li>
           <li class="nav__menu sm" :class="{ 'tm' : stickyMenu }">
-            <a href="/#projects" class="zh mj _i nj">Projects</a>
+            <a href="/#projects" class="zh mj _i nj" :class="{'bi' :page === 'projects'}">Projects</a>
           </li>
           <li class="nav__menu sm" :class="{ 'tm' : stickyMenu }">
-            <a href="/#team" class="zh mj _i nj">Team</a>
+            <a href="/#team" class="zh mj _i nj" :class="{'bi' :page === 'team'}">Team</a>
           </li>
           <li class="nav__menu sm" :class="{ 'tm' : stickyMenu }">
-            <a href="/#contact" class="zh mj _i nj">Contact</a>
+            <a href="/#contact" class="zh mj _i nj" :class="{'bi' :page === 'contact'}">Contact</a>
           </li>
         </ul>
       </nav>

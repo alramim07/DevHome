@@ -23,7 +23,7 @@ class WebsiteSettingsRequest extends FormRequest
     {
         return [
             'tagline' => 'nullable|string|min:20|max:755',
-            'tagline_h' => 'nullable|string|min:45|max:630',
+            'tagline_h' => 'nullable|string|min:25|max:630',
             'tagline_p' => 'nullable|string|min:140|max:300',
             'about_us_img1' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
             'about_us_img2' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',

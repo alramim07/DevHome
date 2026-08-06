@@ -1,10 +1,30 @@
 <section id="about" class="ke eg mm mn">
+  <style>
+    .about-img-wrap {
+      opacity: 0;
+      transition: opacity .8s ease, transform .8s ease;
+    }
+
+    .about-img-wrap.from-top {
+      transform: translateY(-60px);
+    }
+
+    .about-img-wrap.from-bottom {
+      transform: translateY(60px);
+    }
+
+    .about-img-wrap.is-revealed {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
   <div class="a">
     <div class="-ud-mx-4 sb fe wd xd zd">
-      <div class="animate_left oc tf cm/12">
+      <div class="oc tf cm/12">
         <div class="k la sb wb fd">
-          <div class="j l da ra gd ne">
-            <img src="{{ asset('storage/images/Programming wallpaper.jfif') }}" alt="about image"
+          <div class="j l da ra gd ne about-img-wrap from-top" x-data="{ shown: false }"
+            x-intersect.once="shown = true" :class="shown ? 'is-revealed' : ''">
+            <img src="{{ asset('storage/' . $settings->about_us_img1) }}" alt="about image"
               class="oc ne resize" />
             <span class="j p -ud-right-14 -ud-z-10">
               <svg width="61" height="47" viewBox="0 0 61 47" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -38,8 +58,9 @@
               </svg>
             </span>
           </div>
-          <div class="j o r da sa hd ne">
-            <img src="{{ asset('storage/images/4 Ridiculously Simple Ways to Print ‘Hello World’ in Python.jfif') }}"
+          <div class="j o r da sa hd ne about-img-wrap from-bottom" x-data="{ shown: false }"
+            x-intersect.once="shown = true" :class="shown ? 'is-revealed' : ''">
+            <img src="{{ asset('storage/' . $settings->about_us_img2) }}"
               alt="about image" class="oc ne resize" />
           </div>
         </div>

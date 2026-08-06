@@ -1,6 +1,22 @@
+<style>
+    .project-card-zoom {
+        opacity: 0;
+        transform: scale(0.4);
+        transform-origin: center;
+        transition: opacity .6s ease, transform .6s cubic-bezier(0.22, 1, 0.36, 1);
+        will-change: opacity, transform;
+    }
+
+    .project-card-zoom.is-zoomed {
+        opacity: 1;
+        transform: scale(1);
+    }
+</style>
+
 @forelse ($projects as $project)
     <div class="oc tf bl/2 gn/3 qb">
-        <div class="animate_top k eb">
+        <div class="k eb project-card-zoom" x-data="{ shown: false }" x-intersect.once="shown = true"
+            :class="shown ? 'is-zoomed' : ''" :style="'transition-delay: ' + {{ $loop->index }} * 70 + 'ms'">
             <div class="ke se imgnte">
                 <img src="{{ asset("$project->thumbnail") }}" alt="portfolio" class="oc productimg" />
             </div>

@@ -47,7 +47,7 @@
       </div>
       <div class="mb-3">
         <label for="formFileMultiple" class="form-label">About Us 1st Image</label>
-        <input class="form-control form-control-sm bg-dark" name="about_us_image1"  id="formFileSm" type="file">
+        <input class="form-control form-control-sm bg-dark" name="about_us_img1"  id="formFileSm" type="file">
       </div>
       <div class="mb-3">
         <label for="formFileSm" class="form-label">About Us 2nd Image</label>

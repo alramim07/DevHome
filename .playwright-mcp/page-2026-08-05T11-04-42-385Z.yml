@@ -1,0 +1,232 @@
+- generic [active] [ref=f5e1]:
+  - banner [ref=f5e4]:
+    - generic [ref=f5e5]:
+      - link [ref=f5e7] [cursor=pointer]:
+        - /url: http://127.0.0.1:8000
+        - img "Logo Dark" [ref=f5e8]
+      - generic [ref=f5e9]:
+        - navigation [ref=f5e10]:
+          - list [ref=f5e11]:
+            - listitem [ref=f5e12]:
+              - link "Home" [ref=f5e13] [cursor=pointer]:
+                - /url: http://127.0.0.1:8000
+            - listitem [ref=f5e14]:
+              - link "About Us" [ref=f5e15] [cursor=pointer]:
+                - /url: /#about
+            - listitem [ref=f5e16]:
+              - link "Projects" [ref=f5e17] [cursor=pointer]:
+                - /url: /#projects
+            - listitem [ref=f5e18]:
+              - link "Team" [ref=f5e19] [cursor=pointer]:
+                - /url: /#team
+            - listitem [ref=f5e20]:
+              - link "Contact" [ref=f5e21] [cursor=pointer]:
+                - /url: /#contact
+        - checkbox [checked] [ref=f5e26] [cursor=pointer]
+  - main [ref=f5e30]:
+    - generic [ref=f5e45]:
+      - generic [ref=f5e46]: Built for Speed - Engineered For Security
+      - heading "What If Your Business Had No Digital Limits?" [level=1] [ref=f5e47]
+      - paragraph [ref=f5e48]: We don’t just write code—we invent the digital infrastructure that transforms bold visions into hyper-scalable realities. If you can dream it, we can architect, engineer, and deploy it.
+      - list [ref=f5e49]:
+        - listitem [ref=f5e50]:
+          - link "View Projects" [ref=f5e51] [cursor=pointer]:
+            - /url: "#projects"
+        - listitem [ref=f5e52]:
+          - link "Contact Us" [ref=f5e53] [cursor=pointer]:
+            - /url: "#contact"
+    - generic [ref=f5e56]:
+      - generic [ref=f5e58]:
+        - img "about image" [ref=f5e60]
+        - img "about image" [ref=f5e87]
+      - generic [ref=f5e89]:
+        - generic [ref=f5e90]: WHAT WE BUILD
+        - heading "We develop high-performance solutions using the latest tech" [level=2] [ref=f5e91]
+        - heading "Why Dev Home" [level=3] [ref=f5e92]
+        - paragraph [ref=f5e93]: We focus on understanding our clients’ needs and deliver advanced software solutions for all types of businesses.
+        - heading "How We Work" [level=3] [ref=f5e94]
+        - paragraph [ref=f5e95]: We don’t just "install" websites; we build business assets. Our focus is on security forensics, database optimization, and lightning-fast delivery using the latest tech features.
+    - generic [ref=f5e96]:
+      - generic [ref=f5e99]:
+        - generic [ref=f5e100]: Our Portfolio
+        - heading "Our Recent Projects" [level=2] [ref=f5e101]
+        - paragraph [ref=f5e102]: We deliver reliable solutions for all kinds of businesses. Choose yours and take your success to the next level.
+      - list [ref=f5e105]:
+        - listitem [ref=f5e106]:
+          - button "All" [ref=f5e107] [cursor=pointer]
+        - listitem [ref=f5e108]:
+          - button "Laravel" [ref=f5e109] [cursor=pointer]
+        - listitem [ref=f5e110]:
+          - button "PHP" [ref=f5e111] [cursor=pointer]
+        - listitem [ref=f5e112]:
+          - button "MERN" [ref=f5e113] [cursor=pointer]
+        - listitem [ref=f5e114]:
+          - button "Themes" [ref=f5e115] [cursor=pointer]
+      - generic [ref=f5e116]:
+        - generic [ref=f5e118]:
+          - img "portfolio" [ref=f5e120]
+          - generic [ref=f5e121]:
+            - generic [ref=f5e122]: Laravel, Vue.js, MySQL, Stripe...
+            - heading "E-Commerce Platform" [level=3] [ref=f5e123]
+            - link "View Details" [ref=f5e124] [cursor=pointer]:
+              - /url: http://127.0.0.1:8000/project/e-commerce-platform
+        - generic [ref=f5e126]:
+          - img "portfolio" [ref=f5e128]
+          - generic [ref=f5e129]:
+            - generic [ref=f5e130]: Laravel, Livewire, Tailwind CS...
+            - heading "Task Management System" [level=3] [ref=f5e131]
+            - link "View Details" [ref=f5e132] [cursor=pointer]:
+              - /url: http://127.0.0.1:8000/project/task-management-system
+        - generic [ref=f5e134]:
+          - img "portfolio" [ref=f5e136]
+          - generic [ref=f5e137]:
+            - generic [ref=f5e138]: Laravel, React, OpenWeather AP...
+            - heading "Weather Dashboard" [level=3] [ref=f5e139]
+            - link "View Details" [ref=f5e140] [cursor=pointer]:
+              - /url: http://127.0.0.1:8000/project/weather-dashboard
+    - generic [ref=f5e142]:
+      - generic [ref=f5e145]:
+        - generic [ref=f5e146]: Our Team
+        - heading "Our Team Members" [level=2] [ref=f5e147]
+      - generic [ref=f5e148]:
+        - generic [ref=f5e149]:
+          - group "1 / 6" [ref=f5e150]:
+            - generic [ref=f5e151]:
+              - img "image" [ref=f5e153]
+              - generic [ref=f5e154]:
+                - heading "John Doe" [level=4] [ref=f5e155]
+                - paragraph [ref=f5e156]: Full Stack Developer
+                - generic [ref=f5e157]:
+                  - link "" [ref=f5e158] [cursor=pointer]:
+                    - /url: https://facebook.com/johndoe
+                  - link "" [ref=f5e160] [cursor=pointer]:
+                    - /url: https://github.com/lynsromero
+                  - link "" [ref=f5e162] [cursor=pointer]:
+                    - /url: https://linkedin.com/in/johndoe
+          - group "2 / 6" [ref=f5e164]:
+            - generic [ref=f5e165]:
+              - img "image" [ref=f5e167]
+              - generic [ref=f5e168]:
+                - heading "Jane Smith" [level=4] [ref=f5e169]
+                - paragraph [ref=f5e170]: UI/UX Designer
+                - generic [ref=f5e171]:
+                  - link "" [ref=f5e172] [cursor=pointer]:
+                    - /url: https://facebook.com/janesmith
+                  - link "" [ref=f5e174] [cursor=pointer]:
+                    - /url: https://github.com/janesmith
+                  - link "" [ref=f5e176] [cursor=pointer]:
+                    - /url: https://linkedin.com/in/janesmith
+          - group "3 / 6" [ref=f5e178]:
+            - generic [ref=f5e179]:
+              - img "image" [ref=f5e181]
+              - generic [ref=f5e182]:
+                - heading "Ahmed Hassan" [level=4] [ref=f5e183]
+                - paragraph [ref=f5e184]: Backend Developer
+                - generic [ref=f5e185]:
+                  - link "" [ref=f5e186] [cursor=pointer]:
+                    - /url: https://facebook.com/ahmedhassan
+                  - link "" [ref=f5e188] [cursor=pointer]:
+                    - /url: https://github.com/ahmedhassan
+                  - link "" [ref=f5e190] [cursor=pointer]:
+                    - /url: https://linkedin.com/in/ahmedhassan
+          - group "4 / 6" [ref=f5e192]:
+            - generic [ref=f5e193]:
+              - img "image" [ref=f5e195]
+              - generic [ref=f5e196]:
+                - heading "Sarah Johnson" [level=4] [ref=f5e197]
+                - paragraph [ref=f5e198]: DevOps Engineer
+                - generic [ref=f5e199]:
+                  - link "" [ref=f5e200] [cursor=pointer]:
+                    - /url: https://facebook.com/sarahjohnson
+                  - link "" [ref=f5e202] [cursor=pointer]:
+                    - /url: https://github.com/sarahjohnson
+                  - link "" [ref=f5e204] [cursor=pointer]:
+                    - /url: https://linkedin.com/in/sarahjohnson
+          - group "5 / 6" [ref=f5e206]:
+            - generic [ref=f5e207]:
+              - img "image" [ref=f5e209]
+              - generic [ref=f5e210]:
+                - heading "Mike Wilson" [level=4] [ref=f5e211]
+                - paragraph [ref=f5e212]: Mobile Developer
+                - generic [ref=f5e213]:
+                  - link "" [ref=f5e214] [cursor=pointer]:
+                    - /url: https://facebook.com/mikewilson
+                  - link "" [ref=f5e216] [cursor=pointer]:
+                    - /url: https://github.com/mikewilson
+                  - link "" [ref=f5e218] [cursor=pointer]:
+                    - /url: https://linkedin.com/in/mikewilson
+          - group "6 / 6" [ref=f5e220]:
+            - generic [ref=f5e221]:
+              - img "image" [ref=f5e223]
+              - generic [ref=f5e224]:
+                - heading [level=4] [ref=f5e225]:
+                  - link "Son Goku" [ref=f5e226] [cursor=pointer]:
+                    - /url: http://127.0.0.1:8000/team/son-goku
+                - paragraph [ref=f5e227]: Full Stack Developer
+                - generic [ref=f5e228]:
+                  - link "" [ref=f5e229] [cursor=pointer]:
+                    - /url: https://facebook.com/johndoe
+                  - link "" [ref=f5e231] [cursor=pointer]:
+                    - /url: https://github.com/lynsromero
+                  - link "" [ref=f5e233] [cursor=pointer]:
+                    - /url: https://linkedin.com/in/johndoe
+        - generic [ref=f5e235]:
+          - button "Go to slide 1" [ref=f5e236] [cursor=pointer]
+          - button "Go to slide 2" [ref=f5e237] [cursor=pointer]
+          - button "Go to slide 3" [ref=f5e238] [cursor=pointer]
+          - button "Go to slide 4" [ref=f5e239] [cursor=pointer]
+          - button "Go to slide 5" [ref=f5e240] [cursor=pointer]
+          - button "Go to slide 6" [ref=f5e241] [cursor=pointer]
+    - generic [ref=f5e243]:
+      - generic [ref=f5e246]:
+        - heading "Need Help? Contact With Us" [level=2] [ref=f5e247]
+        - paragraph [ref=f5e248]: Submit Your Message, We will be with you as soon as possible...
+      - generic [ref=f5e254]:
+        - generic [ref=f5e256]:
+          - generic [ref=f5e257]: First Name
+          - textbox "First Name" [ref=f5e258]:
+            - /placeholder: Enter your first name
+        - generic [ref=f5e260]:
+          - generic [ref=f5e261]: Last Name
+          - textbox "Last Name" [ref=f5e262]:
+            - /placeholder: Enter your last Name
+        - generic [ref=f5e264]:
+          - generic [ref=f5e265]: Email
+          - textbox "Email" [ref=f5e266]:
+            - /placeholder: Enter your Email
+        - generic [ref=f5e268]:
+          - generic [ref=f5e269]: Phone number
+          - textbox "Phone number" [ref=f5e270]:
+            - /placeholder: Enter your number
+        - generic [ref=f5e272]:
+          - generic [ref=f5e273]: What are you looking for?
+          - textbox "What are you looking for?" [ref=f5e274]:
+            - /placeholder: Type your message here
+        - button "Send Message" [ref=f5e277] [cursor=pointer]
+  - contentinfo [ref=f5e427]:
+    - generic [ref=f5e429]:
+      - generic [ref=f5e431]:
+        - link [ref=f5e432] [cursor=pointer]:
+          - /url: http://127.0.0.1:8000
+          - img "Logo Dark" [ref=f5e433]
+        - paragraph [ref=f5e434]: Here all software, apps, themes, plugins, are our own property. Therefore copying or reselling is strictly prohibited.
+      - generic [ref=f5e436]:
+        - heading "Company" [level=4] [ref=f5e437]
+        - list [ref=f5e438]:
+          - listitem [ref=f5e439]:
+            - link "About company" [ref=f5e440] [cursor=pointer]:
+              - /url: "#about"
+          - listitem [ref=f5e441]:
+            - link "Team" [ref=f5e442] [cursor=pointer]:
+              - /url: "#team"
+          - listitem [ref=f5e443]:
+            - link "Contact us" [ref=f5e444] [cursor=pointer]:
+              - /url: "#contact"
+      - generic [ref=f5e446]:
+        - heading "Want To Join Our Team?" [level=4] [ref=f5e447]
+        - paragraph [ref=f5e448]: Send your portfolio or github profile link here.
+        - generic [ref=f5e449]:
+          - textbox "Your Name" [ref=f5e450]
+          - textbox "Your Portfolio or Github Link" [ref=f5e451]
+          - button [ref=f5e452] [cursor=pointer]
+        - paragraph [ref=f5e455]: ©Copywright by DevHome 2026

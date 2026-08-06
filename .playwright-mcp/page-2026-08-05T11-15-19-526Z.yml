@@ -1,0 +1,140 @@
+- generic [active] [ref=f10e1]:
+  - banner [ref=f10e4]:
+    - generic [ref=f10e5]:
+      - link [ref=f10e7] [cursor=pointer]:
+        - /url: http://127.0.0.1:8000
+        - img "Logo Dark" [ref=f10e8]
+      - generic [ref=f10e9]:
+        - navigation [ref=f10e10]:
+          - list [ref=f10e11]:
+            - listitem [ref=f10e12]:
+              - link "Home" [ref=f10e13] [cursor=pointer]:
+                - /url: http://127.0.0.1:8000
+            - listitem [ref=f10e14]:
+              - link "About Us" [ref=f10e15] [cursor=pointer]:
+                - /url: /#about
+            - listitem [ref=f10e16]:
+              - link "Projects" [ref=f10e17] [cursor=pointer]:
+                - /url: /#projects
+            - listitem [ref=f10e18]:
+              - link "Team" [ref=f10e19] [cursor=pointer]:
+                - /url: /#team
+            - listitem [ref=f10e20]:
+              - link "Contact" [ref=f10e21] [cursor=pointer]:
+                - /url: /#contact
+        - checkbox [checked] [ref=f10e26] [cursor=pointer]
+  - main [ref=f10e30]:
+    - generic [ref=f10e34]:
+      - generic [ref=f10e35]:
+        - img "Joseph McFall" [ref=f10e36]
+        - generic [ref=f10e37]:
+          - generic [ref=f10e38]: Active
+          - heading "Son Goku" [level=4] [ref=f10e39]
+          - text: Full Stack Developer
+      - generic [ref=f10e40]:
+        - generic [ref=f10e41]: Expert Stacks
+        - list [ref=f10e42]:
+          - listitem [ref=f10e43]: PHP
+          - listitem [ref=f10e44]: Laravel
+          - listitem [ref=f10e45]: MERN
+    - generic [ref=f10e48]:
+      - heading "Personal information" [level=2] [ref=f10e50]
+      - separator [ref=f10e51]
+      - generic [ref=f10e52]:
+        - generic [ref=f10e54]:
+          - generic [ref=f10e55]:
+            - term [ref=f10e56]: Full name
+            - definition [ref=f10e57]: Son Goku
+          - generic [ref=f10e58]:
+            - term [ref=f10e59]: Biography
+            - definition
+          - generic [ref=f10e60]:
+            - term [ref=f10e61]: Social
+            - definition [ref=f10e62]:
+              - link [ref=f10e63] [cursor=pointer]:
+                - /url: https://facebook.com/johndoe
+              - link [ref=f10e66] [cursor=pointer]:
+                - /url: https://linkedin.com/in/johndoe
+              - link [ref=f10e71] [cursor=pointer]:
+                - /url: https://github.com/lynsromero
+        - generic [ref=f10e75]:
+          - generic [ref=f10e76]:
+            - generic [ref=f10e77]:
+              - term [ref=f10e78]: Email Adress
+              - link [ref=f10e79] [cursor=pointer]:
+                - /url: https://mail.google.com/mail/?view=cm&fs=1&to=songoku@gmail.com
+                - definition [ref=f10e80]: songoku@gmail.com
+            - generic [ref=f10e85]:
+              - term [ref=f10e86]: Tech Stack Skills
+              - definition [ref=f10e87]:
+                - generic [ref=f10e88]: PHP
+                - generic [ref=f10e89]: Laravel
+                - generic [ref=f10e90]: MERN
+            - generic [ref=f10e91]:
+              - term [ref=f10e92]: Years of Experience
+              - definition [ref=f10e93]: 5+ years
+          - list [ref=f10e94]:
+            - listitem [ref=f10e95]:
+              - link "DevHome CV" [ref=f10e96] [cursor=pointer]:
+                - /url: http://127.0.0.1:8000/cv/devhome/son-goku
+            - listitem [ref=f10e97]:
+              - link "Customized CV" [ref=f10e98] [cursor=pointer]:
+                - /url: http://127.0.0.1:8000/cv/custom/son-goku
+    - generic [ref=f10e99]:
+      - heading "Portfolio Of Son Goku" [level=2] [ref=f10e103]
+      - generic [ref=f10e105]:
+        - heading "Son Goku currently don't have any projects" [level=4] [ref=f10e106]
+        - paragraph [ref=f10e107]: Stay tuned for further updates
+    - generic [ref=f10e109]:
+      - generic [ref=f10e112]:
+        - heading "Need Help? Contact With Me" [level=2] [ref=f10e113]
+        - paragraph [ref=f10e114]: Submit Your Message, I will be with you as soon as possible...
+      - generic [ref=f10e120]:
+        - generic [ref=f10e122]:
+          - generic [ref=f10e123]: First Name
+          - textbox "First Name" [ref=f10e124]:
+            - /placeholder: Enter your first name
+        - generic [ref=f10e126]:
+          - generic [ref=f10e127]: Last Name
+          - textbox "Last Name" [ref=f10e128]:
+            - /placeholder: Enter your last Name
+        - generic [ref=f10e130]:
+          - generic [ref=f10e131]: Email
+          - textbox "Email" [ref=f10e132]:
+            - /placeholder: Enter your Email
+        - generic [ref=f10e134]:
+          - generic [ref=f10e135]: Phone number
+          - textbox "Phone number" [ref=f10e136]:
+            - /placeholder: Enter your number
+        - generic [ref=f10e138]:
+          - generic [ref=f10e139]: What are you looking for?
+          - textbox "What are you looking for?" [ref=f10e140]:
+            - /placeholder: Type your message here
+        - button "Send Message" [ref=f10e143] [cursor=pointer]
+  - contentinfo [ref=f10e293]:
+    - generic [ref=f10e295]:
+      - generic [ref=f10e297]:
+        - link [ref=f10e298] [cursor=pointer]:
+          - /url: http://127.0.0.1:8000
+          - img "Logo Dark" [ref=f10e299]
+        - paragraph [ref=f10e300]: Here all software, apps, themes, plugins, are our own property. Therefore copying or reselling is strictly prohibited.
+      - generic [ref=f10e302]:
+        - heading "Company" [level=4] [ref=f10e303]
+        - list [ref=f10e304]:
+          - listitem [ref=f10e305]:
+            - link "About company" [ref=f10e306] [cursor=pointer]:
+              - /url: "#about"
+          - listitem [ref=f10e307]:
+            - link "Team" [ref=f10e308] [cursor=pointer]:
+              - /url: "#team"
+          - listitem [ref=f10e309]:
+            - link "Contact us" [ref=f10e310] [cursor=pointer]:
+              - /url: "#contact"
+      - generic [ref=f10e312]:
+        - heading "Want To Join Our Team?" [level=4] [ref=f10e313]
+        - paragraph [ref=f10e314]: Send your portfolio or github profile link here.
+        - generic [ref=f10e315]:
+          - textbox "Your Name" [ref=f10e316]
+          - textbox "Your Portfolio or Github Link" [ref=f10e317]
+          - button [ref=f10e318] [cursor=pointer]
+        - paragraph [ref=f10e321]: ©Copywright by DevHome 2026
