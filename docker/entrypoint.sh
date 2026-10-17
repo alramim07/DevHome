@@ -5,6 +5,20 @@ echo "==> DevHome container starting (PORT=${PORT:-10000})"
 
 cd /var/www/html
 
+# --- Database TLS CA certificate -----------------------------------------
+# Managed MySQL providers (e.g. Aiven) require TLS. Supply the CA certificate
+# either as base64 (DB_SSL_CA_PEM_B64) or raw PEM (DB_SSL_CA_PEM); it is
+# written to disk and MYSQL_ATTR_SSL_CA is exported before config is cached.
+if [ -n "$DB_SSL_CA_PEM_B64" ]; then
+  mkdir -p /etc/ssl/db
+  printf '%s' "$DB_SSL_CA_PEM_B64" | base64 -d > /etc/ssl/db/ca.pem
+  export MYSQL_ATTR_SSL_CA=/etc/ssl/db/ca.pem
+elif [ -n "$DB_SSL_CA_PEM" ]; then
+  mkdir -p /etc/ssl/db
+  printf '%s\n' "$DB_SSL_CA_PEM" > /etc/ssl/db/ca.pem
+  export MYSQL_ATTR_SSL_CA=/etc/ssl/db/ca.pem
+fi
+
 # Ensure writable storage exists
 mkdir -p storage/framework/{cache,sessions,views} storage/logs bootstrap/cache
 chown -R www-data:www-data storage bootstrap/cache 2>/dev/null || true

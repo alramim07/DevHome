@@ -32,7 +32,7 @@
                     <div class="swiper-slide">
                         <div class="la cb md">
                             <div class="xa ke oe">
-                                <img src="{{ asset($member->image) }}" alt="image" class="oc" />
+                                <img src="{{ media_url($member->image) }}" alt="image" class="oc" />
                             </div>
                             <div class="yg">
                                 <h4 class="zh mj ta nh">

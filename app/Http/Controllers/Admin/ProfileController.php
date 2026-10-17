@@ -8,6 +8,7 @@ use App\Services\DashboardService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 
 
 class ProfileController extends Controller
@@ -25,8 +26,8 @@ class ProfileController extends Controller
         if ($request->hasFile('image')) {
             $image = $request->file('image');
 
-            if ($user->image && file_exists(public_path($user->image))) {
-                unlink(public_path($user->image));
+            if ($user->image) {
+                Storage::disk('public')->delete(media_path($user->image));
             }
             $filename = $image->hashName();
             $image->storeAs('images', $filename, 'public');
@@ -35,8 +36,8 @@ class ProfileController extends Controller
 
         if ($request->hasFile('custom_cv')) {
             $cv = $request->file('custom_cv');
-            if($user->custom_cv && file_exists(public_path($user->custom_cv))){
-                unlink(public_path($user->custom_cv));
+            if ($user->custom_cv) {
+                Storage::disk('public')->delete(media_path($user->custom_cv));
             }
             $cvFilename = $cv->hashName();
             $cv->storeAs('dev_cvs', $cvFilename, 'public');

@@ -18,7 +18,7 @@
         <div class="k eb project-card-zoom" x-data="{ shown: false }" x-intersect.once="shown = true"
             :class="shown ? 'is-zoomed' : ''" :style="'transition-delay: ' + {{ $loop->index }} * 70 + 'ms'">
             <div class="ke se imgnte">
-                <img src="{{ asset("$project->thumbnail") }}" alt="portfolio" class="oc productimg" loading="lazy" decoding="async" />
+                <img src="{{ media_url($project->thumbnail) }}" alt="portfolio" class="oc productimg" loading="lazy" decoding="async" />
             </div>
             <div class="k ca ma -ud-mt-20 ne cf hj fg ag yg hi">
                 <span class="yh ta qb fh nh">

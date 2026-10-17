@@ -38,7 +38,26 @@ return [
             'report' => false,
         ],
 
-        'public' => [
+        /*
+         * The "public" disk holds user uploads (logos, project images, team
+         * photos, CVs). On hosts with an ephemeral filesystem (e.g. Render's
+         * free tier) it must point at durable, S3-compatible object storage.
+         * Set PUBLIC_DISK_DRIVER=s3 + the AWS_* variables in production;
+         * otherwise it falls back to the local disk for development.
+         */
+        'public' => env('PUBLIC_DISK_DRIVER', 'local') === 's3' ? [
+            'driver' => 's3',
+            'key' => env('AWS_ACCESS_KEY_ID'),
+            'secret' => env('AWS_SECRET_ACCESS_KEY'),
+            'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
+            'bucket' => env('AWS_BUCKET'),
+            'url' => env('AWS_URL'),
+            'endpoint' => env('AWS_ENDPOINT'),
+            'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', true),
+            'visibility' => 'public',
+            'throw' => false,
+            'report' => false,
+        ] : [
             'driver' => 'local',
             'root' => storage_path('app/public'),
             'url' => rtrim(env('APP_URL', 'http://localhost'), '/').'/storage',

@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Projects;
 use App\Services\DashboardService;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 
@@ -104,8 +105,8 @@ class ProjectController extends Controller
     public function destroy($slug)
     {
         $project = Projects::where('slug', $slug)->firstOrFail();
-        if ($project->thumbnail && file_exists(public_path($project->thumbnail))) {
-            unlink(public_path($project->thumbnail));
+        if ($project->thumbnail) {
+            Storage::disk('public')->delete(media_path($project->thumbnail));
         }
         $project->delete();
 

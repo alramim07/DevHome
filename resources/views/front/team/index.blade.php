@@ -5,7 +5,7 @@
             <div class="profile-card">
                 <div class="profile-body">
                     <div class="profile-main-content">
-                        <img class="profile-avatar" src="{{ asset($user->image) }}" alt="Joseph McFall">
+                        <img class="profile-avatar" src="{{ media_url($user->image) }}" alt="Joseph McFall">
 
                         <div class="profile-info">
                             <span class="badge-pro">Active</span>

@@ -8,7 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Dev Home</title>
-    <link rel="icon" href="{{ asset('storage/' . $settings?->fav_icon) ?? 'default-icon.png' }}" type="image/x-icon">
+    <link rel="icon" href="{{ media_url($settings?->fav_icon) ?? 'default-icon.png' }}" type="image/x-icon">
     <link href="{{ asset('front/css/style.css') }}" rel="stylesheet">
     @stack('styles')
 </head>

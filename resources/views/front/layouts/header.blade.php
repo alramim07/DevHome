@@ -4,12 +4,12 @@
     <div class="oc dm/4 sb xd zd">
       <a href="{{ route('home') }}">
         @if ($settings->logo && $settings->logo_dark)
-          <img class="qd hlogo fj" src="{{ asset('storage/' . $settings->logo) }}" height="50px" alt="Logo Light" />
-          <img class="qd hlogo darkl ej" src="{{ asset('storage/' . $settings->logo_dark) }}" height="50px" alt="Logo Dark" />
+          <img class="qd hlogo fj" src="{{ media_url($settings->logo) }}" height="50px" alt="Logo Light" />
+          <img class="qd hlogo darkl ej" src="{{ media_url($settings->logo_dark) }}" height="50px" alt="Logo Dark" />
         @elseif ($settings->logo)
-          <img class="qd hlogo" src="{{ asset('storage/' . $settings->logo) }}" height="50px" alt="Logo" />
+          <img class="qd hlogo" src="{{ media_url($settings->logo) }}" height="50px" alt="Logo" />
         @elseif ($settings->logo_dark)
-          <img class="qd hlogo" src="{{ asset('storage/' . $settings->logo_dark) }}" height="50px" alt="Logo Dark" />
+          <img class="qd hlogo" src="{{ media_url($settings->logo_dark) }}" height="50px" alt="Logo Dark" />
         @else
           <img class="qd hlogo fj" src="images/logo-light.svg" height="50px" alt="Logo Light" />
           <img class="qd hlogo ej" src="images/logo-dark.svg" height="50px" alt="Logo Dark" />

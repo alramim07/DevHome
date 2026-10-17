@@ -7,7 +7,7 @@
                     <div class="card newBack">
                         <div class="card-body">
                             <div class="d-flex flex-column align-items-center text-center">
-                                <img src="{{ $user->image ? asset($user->image) : asset('images/default-user.png') }}"
+                                <img src="{{ $user->image ? media_url($user->image) : asset('images/default-user.png') }}"
                                     alt="Admin" width="110" width="110"
                                     class="rounded-circle p-1 bg-primary profile-pic-custom">
                                 <div class="mt-3">

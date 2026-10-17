@@ -153,7 +153,7 @@
                 <div class="project-card no-break">
                     <div class="ke se imgnte">
                         {{-- Use public_path for thumbnails --}}
-                        <img src="{{ public_path($project->thumbnail) }}" alt="portfolio" class="productimg" />
+                        <img src="{{ media_url($project->thumbnail) }}" alt="portfolio" class="productimg" />
                     </div>
                     <div style="padding-top: 10px;">
                         <span

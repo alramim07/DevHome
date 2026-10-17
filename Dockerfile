@@ -13,6 +13,9 @@ RUN npm run build
 FROM composer:2 AS vendor
 WORKDIR /app
 COPY composer.json composer.lock ./
+# Global helpers are registered in composer.json autoload.files, so make sure
+# the file exists in this stage before autoload generation.
+COPY app/helpers.php ./app/helpers.php
 RUN composer install --no-dev --no-scripts --no-interaction --prefer-dist --optimize-autoloader --ignore-platform-reqs
 
 # ---- Stage 3: runtime ----
@@ -34,6 +37,10 @@ RUN { \
       echo 'opcache.memory_consumption = 128'; \
       echo 'opcache.max_accelerated_files = 20000'; \
     } > /usr/local/etc/php/conf.d/app.ini
+
+# Pass the container environment through to PHP-FPM workers as a safety net
+# (the framework config is cached at boot, but this keeps runtime env() working).
+RUN printf '[www]\nclear_env = no\n' > /usr/local/etc/php-fpm.d/zzz-env.conf
 
 WORKDIR /var/www/html
 

@@ -123,7 +123,7 @@ class HomeController extends Controller
             $path = $file->storeAs('project-images', $fileName, 'public');
 
             // 3. Generate the public URL
-            $url = asset('storage/' . $path);
+            $url = media_url($path);
 
             return response()->json([
                 'fileName' => $fileName,

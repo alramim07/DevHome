@@ -1,14 +1,14 @@
 <div class="sidebar pe-4 pb-3">
     <nav class="navbar bg-secondary navbar-dark">
         <a href="{{ route('dashboard') }}" class="navbar-brand mx-4 mb-3">
-            <img class="text-primary" src="{{ asset('storage/' . $siteSettings?->logo) ?? 'default-icon.png' }}"
+            <img class="text-primary" src="{{ media_url($siteSettings?->logo) ?? 'default-icon.png' }}"
                 alt="Logo" style="height: 50px;">
         </a>
         <div class="d-flex align-items-center ms-4 mb-4"> 
             <div class="position-relative">
                 {{-- Using your asset helper for the perfect circle image --}}
                 <img class="rounded-circle"
-                    src="{{ $user->image ? asset($user->image) : asset('images/default-user.png') }}" alt=""
+                    src="{{ $user->image ? media_url($user->image) : asset('images/default-user.png') }}" alt=""
                     style="width: 40px; height: 40px; object-fit: cover;">
                 <div
                     class="bg-success rounded-circle border border-2 border-white position-absolute end-0 bottom-0 p-1">

@@ -14,7 +14,7 @@
               style="visibility: visible; opacity: 1; transform: matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1); transition: all, opacity 2.8s cubic-bezier(0.5, 0, 0, 1), transform 2.8s cubic-bezier(0.5, 0, 0, 1);">
               <div class="va _a sb xd xk">
                 <div class="ab yb qc ke qe">
-                  <img src="{{ asset($user->image) }}" alt="image" class="oc">
+                  <img src="{{ media_url($user->image) }}" alt="image" class="oc">
                 </div>
                 <p class="mh">
                   By
@@ -86,7 +86,7 @@
             </div>
             <div class="animate_top ke me xf" data-sr-id="5"
               style="visibility: visible; opacity: 1; transform: matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1); transition: all, opacity 2.8s cubic-bezier(0.5, 0, 0, 1), transform 2.8s cubic-bezier(0.5, 0, 0, 1);">
-              <img src="{{ asset($projects->thumbnail) }}" alt="image" class="oc">
+              <img src="{{ media_url($projects->thumbnail) }}" alt="image" class="oc">
             </div>
 
             <div class="animate_top fo project_content" data-sr-id="4">

@@ -3,7 +3,8 @@ services:
     name: devhome
     runtime: docker
     plan: free
-    region: oregon
+    # Pick the region closest to your managed database's region.
+    region: singapore
     healthCheckPath: /up
     autoDeploy: true
     envVars:
@@ -27,6 +28,8 @@ services:
         sync: false
       - key: DB_PASSWORD
         sync: false
+      - key: DB_SSL_CA_PEM_B64
+        sync: false
       - key: SESSION_DRIVER
         value: database
       - key: SESSION_SECURE_COOKIE
@@ -44,4 +47,22 @@ services:
       - key: LOG_LEVEL
         value: warning
       - key: RUN_MIGRATIONS
+        value: "true"
+      - key: PUBLIC_DISK_DRIVER
+        value: s3
+      - key: FILESYSTEM_DISK
+        value: local
+      - key: AWS_ACCESS_KEY_ID
+        sync: false
+      - key: AWS_SECRET_ACCESS_KEY
+        sync: false
+      - key: AWS_DEFAULT_REGION
+        value: ap-southeast-1
+      - key: AWS_BUCKET
+        sync: false
+      - key: AWS_ENDPOINT
+        sync: false
+      - key: AWS_URL
+        sync: false
+      - key: AWS_USE_PATH_STYLE_ENDPOINT
         value: "true"

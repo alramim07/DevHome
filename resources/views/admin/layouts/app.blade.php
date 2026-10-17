@@ -10,7 +10,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <!-- Favicon -->
-    <link rel="icon" href="{{ asset('storage/' . $siteSettings?->fav_icon) ?? 'default-icon.png' }}"
+    <link rel="icon" href="{{ media_url($siteSettings?->fav_icon) ?? 'default-icon.png' }}"
         type="image/x-icon">
     <!-- Google Web Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">

@@ -5,8 +5,8 @@
         <div class="cb oc">
           <a class="lb rb pd" href="{{ route('home') }}">
             @if ($settings?->logo)
-              <img class="qd fj" src="{{ asset('storage/' . $settings->logo) }}" alt="Logo Light" />
-              <img class="qd vb ej" src="{{ asset('storage/' . $settings->logo_dark) }}" alt="Logo Dark" />
+              <img class="qd fj" src="{{ media_url($settings->logo) }}" alt="Logo Light" />
+              <img class="qd vb ej" src="{{ media_url($settings->logo_dark) }}" alt="Logo Dark" />
             @else
               <img class="qd fj" src="images/logo-light.svg" alt="Logo Light" />
               <img class="qd vb ej" src="images/logo-dark.svg" alt="Logo Dark" />

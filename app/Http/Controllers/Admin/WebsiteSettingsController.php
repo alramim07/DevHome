@@ -38,7 +38,7 @@ class WebsiteSettingsController extends Controller
         foreach ($imageFields as $field) {
             if ($request->hasFile($field)) {
                 if ($settings->$field) {
-                    \Illuminate\Support\Facades\Storage::disk('public')->delete($settings->$field);
+                    \Illuminate\Support\Facades\Storage::disk('public')->delete(media_path($settings->$field));
                 }
 
                 $file = $request->file($field);
