@@ -1,50 +1,62 @@
-FROM php:8.3-fpm-alpine
+# ---- Stage 1: build frontend assets ----
+FROM node:20-alpine AS assets
+WORKDIR /app
+ENV PUPPETEER_SKIP_DOWNLOAD=true
+COPY package.json package-lock.json* ./
+RUN npm ci
+COPY vite.config.js ./
+COPY resources ./resources
+COPY public ./public
+RUN npm run build
 
-# Install system dependencies and PHP extensions
-RUN apk add --no-cache \
-    nginx \
-    libpng-dev \
-    libjpeg-turbo-dev \
-    freetype-dev \
-    icu-dev \
-    libxml2-dev \
-    libzip-dev \
-    oniguruma-dev \
-    postgresql-dev \
-    nodejs \
-    npm \
-    && docker-php-ext-install pdo pdo_pgsql gd zip intl opcache
+# ---- Stage 2: composer dependencies ----
+FROM composer:2 AS vendor
+WORKDIR /app
+COPY composer.json composer.lock ./
+RUN composer install --no-dev --no-scripts --no-interaction --prefer-dist --optimize-autoloader --ignore-platform-reqs
 
-# Copy project files
+# ---- Stage 3: runtime ----
+FROM php:8.2-fpm-alpine
+
+# nginx + supervisor + php extensions (pdo_mysql, gd, zip, etc.)
+RUN apk add --no-cache nginx supervisor gettext \
+    oniguruma-dev libpng-dev libjpeg-turbo-dev freetype-dev zip unzip linux-headers $PHPIZE_DEPS \
+ && docker-php-ext-configure gd --with-freetype --with-jpeg \
+ && docker-php-ext-install -j"$(nproc)" pdo_mysql mbstring exif bcmath gd zip opcache \
+ && apk del oniguruma-dev libpng-dev libjpeg-turbo-dev freetype-dev $PHPIZE_DEPS
+
+# PHP production tuning
+RUN { \
+      echo 'memory_limit = 256M'; \
+      echo 'upload_max_filesize = 8M'; \
+      echo 'post_max_size = 8M'; \
+      echo 'opcache.enable = 1'; \
+      echo 'opcache.memory_consumption = 128'; \
+      echo 'opcache.max_accelerated_files = 20000'; \
+    } > /usr/local/etc/php/conf.d/app.ini
+
 WORKDIR /var/www/html
+
+# App source
 COPY . .
+# Composer deps (no dev)
+COPY --from=vendor /app/vendor ./vendor
+# Built assets (Vite manifest + built css/js)
+COPY --from=assets /app/public/build ./public/build
 
-# Install Composer
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
-RUN composer install --no-dev --optimize-autoloader
+# Storage perms + nginx template + entrypoint
+RUN mkdir -p storage/framework/{cache,sessions,views} storage/logs bootstrap/cache \
+ && chown -R www-data:www-data storage bootstrap/cache \
+ && chmod +x docker/entrypoint.sh
 
-# Build assets
-RUN npm install && npm run build
+# Build the package-discovery cache at image build time
+# (composer ran with --no-scripts, which normally triggers package:discover)
+RUN php artisan package:discover --ansi || true
 
-# Configure Permissions
-RUN chown -R www-data:www-data storage bootstrap/cache
-RUN chmod -R 775 storage bootstrap/cache
-RUN chown -R www-data:www-data storage bootstrap/cache
+COPY docker/default.conf.template /etc/nginx/templates/default.conf.template
+COPY docker/supervisord.conf /etc/supervisord.conf
 
-# Nginx config (This tells Render how to serve your /public folder)
-RUN printf "server { \n\
-    listen 80; \n\
-    root /var/www/html/public; \n\
-    index index.php; \n\
-    location / { try_files \$uri \$uri/ /index.php?\$args; } \n\
-    location ~ \.php$ { \n\
-        include fastcgi_params; \n\
-        fastcgi_pass 127.0.0.1:9000; \n\
-        fastcgi_param SCRIPT_FILENAME \$document_root\$fastcgi_script_name; \n\
-    } \n\
-}" > /etc/nginx/http.d/default.conf
+ENV PORT=10000
+EXPOSE 10000
 
-# Start Command
-CMD php-fpm -D && nginx -g 'daemon off;'
-
-EXPOSE 80
+ENTRYPOINT ["/var/www/html/docker/entrypoint.sh"]

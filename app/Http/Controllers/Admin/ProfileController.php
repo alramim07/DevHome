@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\ProfileUpdateRequest;
 use App\Services\DashboardService;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
 
 
@@ -27,7 +28,7 @@ class ProfileController extends Controller
             if ($user->image && file_exists(public_path($user->image))) {
                 unlink(public_path($user->image));
             }
-            $filename = time() . '_' . $image->getClientOriginalName();
+            $filename = $image->hashName();
             $image->storeAs('images', $filename, 'public');
             $user->image = 'storage/images/' . $filename;
         }
@@ -37,7 +38,7 @@ class ProfileController extends Controller
             if($user->custom_cv && file_exists(public_path($user->custom_cv))){
                 unlink(public_path($user->custom_cv));
             }
-            $cvFilename = time() . '_' . $cv->getClientOriginalName();
+            $cvFilename = $cv->hashName();
             $cv->storeAs('dev_cvs', $cvFilename, 'public');
             $user->custom_cv = 'storage/dev_cvs/' . $cvFilename;
         }
@@ -66,6 +67,7 @@ class ProfileController extends Controller
             ]);
         }
         $user->save();
+        Cache::forget('site.team');
 
         return redirect()->back()->with('success', 'Profile updated!');
     }

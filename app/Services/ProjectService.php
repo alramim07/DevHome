@@ -18,8 +18,12 @@ class ProjectService
         // Apply Filtering
         if ($request->filled('filter') && $filter !== 'all') {
             $filter = strtolower(trim($filter));
-            $query->whereRaw('LOWER(tech_stack) LIKE ?', ['%' . $filter . '%']);
-            
+
+            // Escape LIKE metacharacters so user input cannot change the match pattern.
+            $term = str_replace(['\\', '%', '_'], ['\\\\', '\%', '\_'], $filter);
+
+            $query->whereRaw('LOWER(tech_stack) LIKE ? ESCAPE ?', ['%' . $term . '%', '\\']);
+
             // If filtering, we usually want all matches
             return $query->get();
         }

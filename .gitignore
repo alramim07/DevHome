@@ -22,3 +22,7 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+# Local tooling artifacts
+/.playwright-mcp
+/vendor.zip

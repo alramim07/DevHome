@@ -8,6 +8,7 @@ use App\Models\WantToJoin;
 use App\Services\HomeService;
 use Illuminate\Http\Request;
 use App\Http\Requests\JoinRequest;
+use App\Models\Notification;
 class TeamController extends Controller
 {
     public function index(Request $request, HomeService $homeService, $slug)
@@ -28,6 +29,15 @@ class TeamController extends Controller
         $join->name = $request->name;
         $join->link = $request->link;
         $join->save();
+
+        Notification::create([
+            'user_id' => 1,
+            'type'    => 'join_request',
+            'title'   => 'New join request from ' . $request->name,
+            'body'    => $request->link,
+            'url'     => route('join.list'),
+        ]);
+
         return redirect()->back()->with('success', 'Request sent successfully');
     }
 }

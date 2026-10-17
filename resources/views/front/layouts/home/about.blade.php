@@ -25,7 +25,7 @@
           <div class="j l da ra gd ne about-img-wrap from-top" x-data="{ shown: false }"
             x-intersect.once="shown = true" :class="shown ? 'is-revealed' : ''">
             <img src="{{ asset('storage/' . $settings->about_us_img1) }}" alt="about image"
-              class="oc ne resize" />
+              class="oc ne resize" loading="lazy" decoding="async" />
             <span class="j p -ud-right-14 -ud-z-10">
               <svg width="61" height="47" viewBox="0 0 61 47" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <circle cx="15.6667" cy="30.9998" r="1.66667" transform="rotate(-90 15.6667 30.9998)" fill="#3056D3" />
@@ -61,7 +61,7 @@
           <div class="j o r da sa hd ne about-img-wrap from-bottom" x-data="{ shown: false }"
             x-intersect.once="shown = true" :class="shown ? 'is-revealed' : ''">
             <img src="{{ asset('storage/' . $settings->about_us_img2) }}"
-              alt="about image" class="oc ne resize" />
+              alt="about image" class="oc ne resize" loading="lazy" decoding="async" />
           </div>
         </div>
       </div>

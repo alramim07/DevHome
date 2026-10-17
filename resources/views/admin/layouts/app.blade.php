@@ -7,6 +7,7 @@
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <meta content="" name="keywords">
     <meta content="" name="description">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <!-- Favicon -->
     <link rel="icon" href="{{ asset('storage/' . $siteSettings?->fav_icon) ?? 'default-icon.png' }}"
@@ -141,6 +142,64 @@
             promotion: false,
             statusbar: false
         });
+    </script>
+    <script>
+    (function () {
+        var csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+        var typeIcons = {
+            email:        'fa-envelope',
+            contact:      'fa-comments',
+            join_request: 'fa-user-plus'
+        };
+
+        function renderNotifications(data) {
+            var dot  = document.getElementById('notifDot');
+            var list = document.getElementById('notifList');
+            if (!dot || !list) return;
+
+            if (!data.count) {
+                dot.style.display = 'none';
+                list.innerHTML = '<div class="text-center text-secondary py-3 small">No new notifications</div>';
+                return;
+            }
+
+            dot.style.display = 'block';
+
+            var html = data.notifications.map(function (n) {
+                var icon = typeIcons[n.type] || 'fa-bell';
+                var body = n.body
+                    ? '<div class="text-secondary" style="font-size:0.73rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + n.body + '</div>'
+                    : '';
+                return '<a href="' + n.url + '" class="d-flex align-items-start px-3 py-2 border-bottom border-dark text-decoration-none notif-link">'
+                    + '<div class="me-2 mt-1"><i class="fa ' + icon + ' text-primary small"></i></div>'
+                    + '<div style="overflow:hidden;flex:1;">'
+                    + '<div class="text-white small fw-semibold" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + n.title + '</div>'
+                    + body
+                    + '<div class="text-primary" style="font-size:0.7rem;">' + n.created_at + '</div>'
+                    + '</div></a>';
+            }).join('');
+
+            list.innerHTML = html;
+        }
+
+        function fetchNotifications() {
+            $.getJSON('/notifications/feed', renderNotifications).fail(function () {});
+        }
+
+        $(document).ready(function () {
+            fetchNotifications();
+            setInterval(fetchNotifications, 60000);
+
+            $(document).on('click', '#markAllRead', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                $.post('/notifications/mark-read', { _token: csrfToken }, function () {
+                    renderNotifications({ count: 0, notifications: [] });
+                });
+            });
+        });
+    }());
     </script>
     @stack('scripts')
 </body>

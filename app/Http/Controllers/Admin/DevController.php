@@ -7,6 +7,7 @@ use App\Http\Requests\AddDevRequest;
 use App\Models\User;
 use App\Services\DashboardService;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 
 class DevController extends Controller
@@ -39,6 +40,7 @@ class DevController extends Controller
         }
 
         $targetDev->delete();
+        Cache::forget('site.team');
         return redirect()->route('dev.list')->with('success', 'Developer removed successfully.');
     }
 
@@ -65,6 +67,7 @@ class DevController extends Controller
 
 
         $targetDev->delete();
+        Cache::forget('site.team');
 
         return response()->json([
             'success' => true,
@@ -116,6 +119,7 @@ class DevController extends Controller
         $dev->languages = implode(',', $request->input('languages', []));
         $dev->password = bcrypt($request->password);
         $dev->save();
+        Cache::forget('site.team');
 
         return redirect()->route('dev.list')->with('success', 'Developer added successfully.');
     }

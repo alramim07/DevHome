@@ -12,20 +12,20 @@ use App\Http\Controllers\Admin\TodoController;
 use App\Http\Controllers\Admin\WebsiteSettingsController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CVController;
+use App\Http\Controllers\Admin\NotificationController;
 
 
 // FrontEnd
 Route::controller(HomeController::class)->group(function () {
     Route::get('/', 'index')->name('home');
     Route::get('/project/{slug}',  'project')->name('project.view');
-    Route::POST('/contact-us', 'submit')->name('contact.submit');
-    Route::POST('/contact-me',  'contactMe')->name('email.submit');
-    Route::post('/project-image-upload',  'uploadEditorImage')->name('project.image.upload');
+    Route::POST('/contact-us', 'submit')->name('contact.submit')->middleware('throttle:contact');
+    Route::POST('/contact-me',  'contactMe')->name('email.submit')->middleware('throttle:contact');
 });
 
 Route::controller(TeamController::class)->group(function () {
     Route::get('/team/{slug}', 'index')->name('team');
-    Route::post('join/request', 'joinreq')->name('team.request');
+    Route::post('join/request', 'joinreq')->name('team.request')->middleware('throttle:forms');
 });
 
 
@@ -50,13 +50,17 @@ Route::controller(CVController::class)->group(function () {
 // Admin Side
 Route::get('/login', [AdminController::class, 'loginPageView'])->name('login');
 
-Route::post('/login', [AdminController::class, 'login'])->name('login.post');
+Route::post('/login', [AdminController::class, 'login'])->name('login.post')->middleware('throttle:login');
 Route::get('/logout', [AdminController::class, 'logout'])->name('logout');
 
 
 
 
 Route::middleware('auth')->group(function () {
+
+    Route::post('/project-image-upload', [HomeController::class, 'uploadEditorImage'])
+        ->name('project.image.upload')
+        ->middleware('throttle:uploads');
 
     Route::get('/dashboard', [AdminController::class, 'index'])->name('dashboard');
 
@@ -96,4 +100,7 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/join-list', [TeamRequest::class, 'index'])->name('join.list');
     Route::delete('/join-delete/{id}', [TeamRequest::class, 'destroy'])->name('join.delete');
+
+    Route::get('/notifications/feed', [NotificationController::class, 'feed'])->name('notifications.feed');
+    Route::post('/notifications/mark-read', [NotificationController::class, 'markAllRead'])->name('notifications.mark-read');
 });

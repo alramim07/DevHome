@@ -42,17 +42,16 @@ class WebsiteSettingsController extends Controller
                 }
 
                 $file = $request->file($field);
-                $fileName = $field . '_' . time() . '.' . $file->getClientOriginalExtension();
                 $path = $file->store('web-settings', 'public');
-                $fileName =  $path;
-
-                $data[$field] = $fileName;
+                $data[$field] = $path;
             }
         }
 
         // 4. Update the database
         // We use id 1 to keep it as a single configuration row
         Website_settings::updateOrCreate(['id' => 1], $data);
+
+        \Illuminate\Support\Facades\Cache::forget('site.settings');
 
         return redirect()->back()->with('success', 'Website settings updated successfully.');
     }

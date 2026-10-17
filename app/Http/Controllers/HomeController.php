@@ -13,6 +13,8 @@ use Illuminate\Http\Request;
 use App\Models\ProjectView;
 use Illuminate\Support\Carbon;
 use App\Services\HomeService;
+use App\Models\Notification;
+use Illuminate\Support\Str;
 
 class HomeController extends Controller
 {
@@ -63,6 +65,13 @@ class HomeController extends Controller
 
         Contact::create($request->validated());
 
+        Notification::create([
+            'user_id' => 1,
+            'type'    => 'contact',
+            'title'   => 'New contact from ' . $request->first_name . ' ' . $request->last_name,
+            'body'    => Str::limit($request->message, 80),
+            'url'     => route('website.contacts'),
+        ]);
 
         return response()->json([
             'success' => true,
@@ -79,9 +88,17 @@ class HomeController extends Controller
         }
 
         Email::create(array_merge($request->validated(), [
-            'user_id' => $targetUserId,            
+            'user_id' => $targetUserId,
             'project_id' => $request->project_id ?? null
         ]));
+
+        Notification::create([
+            'user_id' => $targetUserId,
+            'type'    => 'email',
+            'title'   => 'New email from ' . $request->first_name . ' ' . $request->last_name,
+            'body'    => Str::limit($request->message, 80),
+            'url'     => route('email.list'),
+        ]);
 
         return response()->json([
             'success' => true,
@@ -91,14 +108,18 @@ class HomeController extends Controller
 
     public function uploadEditorImage(Request $request)
     {
+        $request->validate([
+            'upload' => 'required|file|image|mimes:jpg,jpeg,png,webp,gif|max:5120',
+        ]);
+
         if ($request->hasFile('upload')) {
             $file = $request->file('upload');
 
-            // 1. Generate a unique name
-            $fileName = time() . '_' . $file->getClientOriginalName();
+            // 1. Generate a safe name derived from the file's real (validated) type,
+            //    never from the client-supplied extension.
+            $fileName = $file->hashName();
 
             // 2. Store the image in storage/app/public/project-images
-            // 'public' disk refers to the storage/app/public folder
             $path = $file->storeAs('project-images', $fileName, 'public');
 
             // 3. Generate the public URL

@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\User;
 use App\Models\Website_settings;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 /**
  * Class HomeService
@@ -24,8 +25,8 @@ class HomeService
     {
         return [
             'projects' => $this->projectService->getFilteredProjects($request),
-            'teams'    => User::all(),
-            'settings' => Website_settings::first(),
+            'teams'    => Cache::remember('site.team', 600, fn () => User::all()),
+            'settings' => Cache::remember('site.settings', 600, fn () => Website_settings::first() ?? new Website_settings()),
         ];
     }
 }
