@@ -21,12 +21,13 @@ RUN composer install --no-dev --no-scripts --no-interaction --prefer-dist --opti
 # ---- Stage 3: runtime ----
 FROM php:8.2-fpm-alpine
 
-# nginx + supervisor + php extensions (pdo_mysql, gd, zip, etc.)
+# nginx + supervisor + php extensions (pdo_mysql, zip, etc.)
+# GD removed — not needed for serving uploaded images; keeps image smaller and avoids
+# Alpine shared-library issues at runtime (libpng16.so.16 missing after apk del).
 RUN apk add --no-cache nginx supervisor gettext \
-    oniguruma-dev libpng-dev libjpeg-turbo-dev freetype-dev libzip-dev zip unzip linux-headers $PHPIZE_DEPS \
- && docker-php-ext-configure gd --with-freetype --with-jpeg \
- && docker-php-ext-install -j"$(nproc)" pdo_mysql mbstring exif bcmath gd zip opcache \
- && apk del oniguruma-dev libpng-dev libjpeg-turbo-dev freetype-dev $PHPIZE_DEPS
+    oniguruma-dev libzip-dev zip unzip linux-headers $PHPIZE_DEPS \
+ && docker-php-ext-install -j"$(nproc)" pdo_mysql mbstring exif bcmath zip opcache \
+ && apk del oniguruma-dev libzip-dev $PHPIZE_DEPS
 
 # PHP production tuning
 RUN { \
