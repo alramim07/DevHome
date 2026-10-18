@@ -23,7 +23,7 @@ FROM php:8.2-fpm-alpine
 
 # nginx + supervisor + php extensions (pdo_mysql, gd, zip, etc.)
 RUN apk add --no-cache nginx supervisor gettext \
-    oniguruma-dev libpng-dev libjpeg-turbo-dev freetype-dev zip unzip linux-headers $PHPIZE_DEPS \
+    oniguruma-dev libpng-dev libjpeg-turbo-dev freetype-dev libzip-dev zip unzip linux-headers $PHPIZE_DEPS \
  && docker-php-ext-configure gd --with-freetype --with-jpeg \
  && docker-php-ext-install -j"$(nproc)" pdo_mysql mbstring exif bcmath gd zip opcache \
  && apk del oniguruma-dev libpng-dev libjpeg-turbo-dev freetype-dev $PHPIZE_DEPS
