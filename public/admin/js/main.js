@@ -13,13 +13,20 @@
     
     
     // Back to top button
-    $(window).scroll(function () {
-        if ($(this).scrollTop() > 300) {
+    function toggleBackToTop() {
+        if ($(window).scrollTop() > 300) {
             $('.back-to-top').fadeIn('slow');
         } else {
             $('.back-to-top').fadeOut('slow');
         }
-    });
+    }
+
+    // Check on scroll
+    $(window).scroll(toggleBackToTop);
+
+    // Check on page load — hides button if page isn't scrollable
+    toggleBackToTop();
+
     $('.back-to-top').click(function () {
         $('html, body').animate({scrollTop: 0}, 1500, 'easeInOutExpo');
         return false;
