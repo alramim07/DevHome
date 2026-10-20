@@ -14,6 +14,7 @@ use App\Http\Controllers\Admin\WebsiteSettingsController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CVController;
 use App\Http\Controllers\SitemapController;
+use App\Http\Controllers\RobotsController;
 use App\Http\Controllers\Admin\NotificationController;
 
 
@@ -42,6 +43,9 @@ Route::controller(CVController::class)->group(function () {
 
 // Dynamic Sitemap (public, no auth)
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
+
+// Robots.txt
+Route::get('/robots.txt', [RobotsController::class, 'index'])->name('robots');
 
 
 
