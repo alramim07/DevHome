@@ -76,6 +76,11 @@
                     <a href="{{ route('team.members') }}"
                         class="dropdown-item {{ request()->routeIs('team.members') ? 'active text-primary' : '' }}">All
                         Members</a>
+                    @if (auth()->user()->isSuperAdmin())
+                    <a href="{{ route('team.members.create') }}"
+                        class="dropdown-item {{ request()->routeIs('team.members.create') ? 'active text-primary' : '' }}">Create
+                        User</a>
+                    @endif
                 </div>
             </div>
             @endcan

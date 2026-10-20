@@ -34,10 +34,10 @@ class TeamManagementAccessTest extends TestCase
         $this->actingAs($user)->get('/teams')->assertOk();
     }
 
-    public function test_members_route_redirects_until_task5(): void
+    public function test_members_route_is_real_page_since_task5(): void
     {
         $user = User::factory()->create(['role' => 'super_admin']);
 
-        $this->actingAs($user)->get('/members')->assertRedirect(route('team.positions'));
+        $this->actingAs($user)->get('/members')->assertOk();
     }
 }

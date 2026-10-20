@@ -1,7 +1,6 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminController;
-use App\Http\Controllers\Admin\DevController;
 use App\Http\Controllers\Admin\EmailController;
 use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\TeamRequest;
@@ -88,12 +87,9 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/website-contacts', [AdminController::class, 'contacts'])->name('website.contacts')->middleware('section:website_contacts');
 
-    Route::get('/add-dev', [DevController::class, 'addDevView'])->name('add.dev');
-    Route::post('/add-dev', [DevController::class, 'addDev'])->name('add.dev.post');
-
-    Route::get('/dev-list', [DevController::class, 'index'])->name('dev.list');
-    Route::get('/remove-dev/{id}', [DevController::class, 'remove'])->name('remove.dev');
-    Route::post('/remove-dev-ajax/{id}', [DevController::class, 'removeAjax'])->name('remove.dev.ajax');
+    // Legacy dev-management URLs → Team Management (All Members).
+    Route::get('/add-dev', fn () => redirect()->route('team.members.create'))->name('add.dev');
+    Route::get('/dev-list', fn () => redirect()->route('team.members'))->name('dev.list');
 
     Route::get('/todo', [TodoController::class, 'index'])->name('todo')->middleware('section:todo');
     Route::post('/todo/store', [TodoController::class, 'store'])->name('todo.store')->middleware('section:todo');
@@ -117,8 +113,16 @@ Route::middleware('auth')->group(function () {
         Route::post('/teams/{team}/members', [TeamManagementController::class, 'addMember'])->name('team.teams.members.add');
         Route::post('/teams/{team}/members/{userId}/remove', [TeamManagementController::class, 'removeMember'])->name('team.teams.members.remove');
 
-        // All Members — replaced in Task 5; redirect keeps the sidebar link working now.
-        Route::get('/members', fn () => redirect()->route('team.positions'))->name('team.members');
+        // All Members: list + filters (view: section holders; writes: super admin).
+        // NOTE: {userId} not {user} — User's route key is slug, but all
+        // management URLs use numeric IDs.
+        Route::get('/members', [TeamManagementController::class, 'members'])->name('team.members');
+        Route::get('/members/create', [TeamManagementController::class, 'createMember'])->name('team.members.create');
+        Route::post('/members', [TeamManagementController::class, 'storeMember'])->name('team.members.store');
+        Route::get('/members/{userId}/edit', [TeamManagementController::class, 'editMember'])->name('team.members.edit');
+        Route::post('/members/{userId}/update', [TeamManagementController::class, 'updateMember'])->name('team.members.update');
+        Route::post('/members/{userId}/delete', [TeamManagementController::class, 'deleteMember'])->name('team.members.delete');
+        Route::post('/members/{userId}/restore', [TeamManagementController::class, 'restoreMember'])->name('team.members.restore');
     });
 
     Route::get('/notifications/feed', [NotificationController::class, 'feed'])->name('notifications.feed');
