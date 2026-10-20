@@ -25,7 +25,7 @@ protected $casts = [
 
     public function dailyViews()
 {
-    return $this->hasMany(ProjectView::class, 'projects_id');
+    return $this->hasMany(ProjectView::class, 'project_id');
 }
 
 
