@@ -92,6 +92,7 @@
     <script>
         tinymce.init({
             selector: 'textarea#description',
+            license_key: 'gpl',
             plugins: [
                 'anchor', 'autolink', 'charmap', 'codesample', 'emoticons', 'link', 'lists', 'media',
                 'image', // Added 'image' plugin
