@@ -23,7 +23,7 @@ class SitemapController extends Controller
 
     protected function generateSitemap(): string
     {
-        $baseUrl = config('app.url');
+        $baseUrl = rtrim(config('app.url'), '/');
         $urls = [];
 
         // Static pages (always accessible)

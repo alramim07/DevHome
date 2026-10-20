@@ -16,23 +16,43 @@ use Illuminate\Support\Carbon;
 use App\Services\HomeService;
 use App\Models\Notification;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Log;
 
 class HomeController extends Controller
 {
     public function index(Request $request, HomeService $homeService)
     {
 
-        $data = $homeService->getHomeData($request);
+        try {
+            $data = $homeService->getHomeData($request);
 
+            if ($request->ajax()) {
+                return view('front.partials.project_cards', [
+                    'projects' => $data['projects']
+                ])->render();
+            }
 
-        if ($request->ajax()) {
-            return view('front.partials.project_cards', [
-                'projects' => $data['projects']
-            ])->render();
+            return view('front.layouts.home.index', $data);
+        } catch (\Exception $e) {
+            Log::error('HomeController@index error: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            // Fallback: return a minimal homepage without crashing
+            $fallbackData = [
+                'projects' => collect(),
+                'teams' => collect(),
+                'settings' => new \App\Models\Website_settings(),
+            ];
+            
+            if ($request->ajax()) {
+                return view('front.partials.project_cards', [
+                    'projects' => collect()
+                ])->render();
+            }
+            
+            return view('front.layouts.home.index', $fallbackData);
         }
-
-
-        return view('front.layouts.home.index', $data);
     }
 
 
