@@ -54,9 +54,9 @@
             <a href="{{ route('website.contacts') }}" class="nav-item nav-link"><i
                     class="fa fa-keyboard me-2"></i>Website Contacts</a>
             <a href="{{ route('dev.list') }}" class="nav-item nav-link"><i class="fa fa-table me-2"></i>Dev List</a>
+            <a href="{{ route('join.list') }}" class="nav-item nav-link"><i class="fa fa-table me-2"></i>Join Requests</a>
             @endif
             <a href="{{ route('todo') }}" class="nav-item nav-link"><i class="fa fa-table me-2"></i>To Do List</a>
-            <a href="{{ route('join.list') }}" class="nav-item nav-link"><i class="fa fa-table me-2"></i>Join Requests</a>
         </div>
     </nav>
 </div>

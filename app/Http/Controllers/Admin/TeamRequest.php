@@ -12,7 +12,14 @@ class TeamRequest extends Controller
 {
     public function index(DashboardService $service)
     {
-        $requests = $service->getStats(Auth::user());
+        $user = Auth::user();
+        if ($user->id !== 1) {
+            return response()->view('admin.403_redirect', [
+                'message' => 'Unauthorized action. Redirecting to dashboard...',
+                'url' => route('dashboard'),
+            ], 403);
+        }
+        $requests = $service->getStats($user);
         return view('admin.team-request', $requests);
     }
 
