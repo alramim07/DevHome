@@ -98,7 +98,7 @@
         <button class="copy-btn" onclick="copyTechStack()"><i class="far fa-copy"></i></button>
     </div>
     <div class="code-body">
-        <pre><code id="tech-stack-text">{{ implode(', ', $projects->tech_stack) }}</code></pre>
+        <pre><code id="tech-stack-text">{{ implode(', ', is_array($projects->tech_stack) ? $projects->tech_stack : []) }}</code></pre>
     </div>
 </div>
 

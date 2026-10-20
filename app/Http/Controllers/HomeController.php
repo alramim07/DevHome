@@ -58,27 +58,34 @@ class HomeController extends Controller
 
     public function project(Request $request, $slug)
     {
-        $projects = Projects::where('slug', $slug)->firstOrFail();
-        $ip = $request->ip();
-        $settings = Website_settings::first();
+        try {
+            $projects = Projects::where('slug', $slug)->firstOrFail();
+            $ip = $request->ip();
+            $settings = Website_settings::first();
 
-        $alreadyViewed = ProjectView::where('project_id', $projects->id)
-            ->where('ip_address', $ip)
-            ->where('created_at', '>=', Carbon::now()->subDays(30))
-            ->exists();
+            $alreadyViewed = ProjectView::where('project_id', $projects->id)
+                ->where('ip_address', $ip)
+                ->where('created_at', '>=', Carbon::now()->subDays(30))
+                ->exists();
 
-        if (!$alreadyViewed) {
-            $projects->increment('views');
+            if (!$alreadyViewed) {
+                $projects->increment('views');
 
-            ProjectView::create([
-                'project_id' => $projects->id,
-                'ip_address' => $ip,
+                ProjectView::create([
+                    'project_id' => $projects->id,
+                    'ip_address' => $ip,
+                ]);
+            }
+
+            $user = User::where('id', $projects->user_id)->firstOrFail();
+
+            return view('front.layouts.home.project', compact('projects', 'user', 'settings'));
+        } catch (\Throwable $e) {
+            \Log::critical('HomeController@project error for slug ' . $slug . ': ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
             ]);
+            abort(404, 'Project not found');
         }
-
-        $user = User::where('id', $projects->user_id)->firstOrFail();
-
-        return view('front.layouts.home.project', compact('projects', 'user', 'settings'));
     }
 
     /**
@@ -87,19 +94,26 @@ class HomeController extends Controller
      */
     public function blogShow($slug)
     {
-        $blog = Blog::published()->where('slug', $slug)->firstOrFail();
+        try {
+            $blog = Blog::published()->where('slug', $slug)->firstOrFail();
 
-        $settings = Website_settings::first();
+            $settings = Website_settings::first();
 
-        $suggested = Blog::published()
-            ->where('id', '!=', $blog->id)
-            ->latest('published_at')
-            ->take(3)
-            ->get();
+            $suggested = Blog::published()
+                ->where('id', '!=', $blog->id)
+                ->latest('published_at')
+                ->take(3)
+                ->get();
 
-        $author = User::withTrashed()->find($blog->user_id);
+            $author = User::withTrashed()->find($blog->user_id);
 
-        return view('front.layouts.home.blog', compact('blog', 'settings', 'suggested', 'author'));
+            return view('front.layouts.home.blog', compact('blog', 'settings', 'suggested', 'author'));
+        } catch (\Throwable $e) {
+            \Log::critical('HomeController@blogShow error for slug ' . $slug . ': ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
+            abort(404, 'Blog post not found');
+        }
     }
 
     public function submit(ContactRequest $request)

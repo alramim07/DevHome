@@ -13,14 +13,21 @@ class TeamController extends Controller
 {
     public function index(Request $request, HomeService $homeService, $slug)
     {
-        $user = User::where('slug', $slug)->firstOrFail();
-        $projects = Projects::where('user_id', $user->id)->get();
-        
-        $homeData = $homeService->getHomeData($request);
-       
-        $viewData = array_merge($homeData, ['projects' => $projects, 'user' => $user]);
-
-        return view('front.team.index', $viewData);
+        try {
+            $user = User::where('slug', $slug)->firstOrFail();
+            $projects = Projects::where('user_id', $user->id)->get();
+            
+            $homeData = $homeService->getHomeData($request);
+           
+            $viewData = array_merge($homeData, ['projects' => $projects, 'user' => $user]);
+    
+            return view('front.team.index', $viewData);
+        } catch (\Throwable $e) {
+            \Log::critical('TeamController@index error for slug ' . $slug . ': ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
+            abort(500, 'Unable to load team profile');
+        }
     }
     public function joinreq (JoinRequest $request)
     {
