@@ -46,17 +46,46 @@
                 </div>
             </div>
 
-            <a href="{{ route('website.settings') }}" class="nav-item nav-link"><i class="fa fa-th me-2"></i>Website
+            @can('section', 'website_settings')
+            <a href="{{ route('website.settings') }}"
+                class="nav-item nav-link {{ request()->routeIs('website.settings') ? 'active' : '' }}"><i
+                    class="fa fa-th me-2"></i>Website
                 Settings</a>
+            @endcan
+            @can('section', 'email_list')
             <a href="{{ route('email.list') }}" class="nav-item nav-link"><i
                     class="fa fa-keyboard me-2"></i>E-mails</a>
-            @if (auth()->id() === 1)
+            @endcan
+            @can('section', 'website_contacts')
             <a href="{{ route('website.contacts') }}" class="nav-item nav-link"><i
                     class="fa fa-keyboard me-2"></i>Website Contacts</a>
-            <a href="{{ route('dev.list') }}" class="nav-item nav-link"><i class="fa fa-table me-2"></i>Dev List</a>
-            <a href="{{ route('join.list') }}" class="nav-item nav-link"><i class="fa fa-table me-2"></i>Join Requests</a>
-            @endif
+            @endcan
+            @can('section', 'team_management')
+            <div class="nav-item dropdown">
+                <a href="#"
+                    class="nav-link dropdown-toggle {{ request()->routeIs(['team.positions', 'team.teams', 'team.members']) ? 'active' : '' }}"
+                    data-bs-toggle="dropdown">
+                    <i class="fa fa-users me-2"></i>Team Management
+                </a>
+                <div
+                    class="dropdown-menu bg-transparent border-0 {{ request()->routeIs(['team.positions', 'team.teams', 'team.members']) ? 'show' : '' }}">
+                    <a href="{{ route('team.positions') }}"
+                        class="dropdown-item {{ request()->routeIs('team.positions') ? 'active text-primary' : '' }}">Positions</a>
+                    <a href="{{ route('team.teams') }}"
+                        class="dropdown-item {{ request()->routeIs('team.teams') ? 'active text-primary' : '' }}">Teams</a>
+                    <a href="{{ route('team.members') }}"
+                        class="dropdown-item {{ request()->routeIs('team.members') ? 'active text-primary' : '' }}">All
+                        Members</a>
+                </div>
+            </div>
+            @endcan
+            @can('section', 'join_requests')
+            <a href="{{ route('join.list') }}" class="nav-item nav-link"><i class="fa fa-table me-2"></i>Join
+                Requests</a>
+            @endcan
+            @can('section', 'todo')
             <a href="{{ route('todo') }}" class="nav-item nav-link"><i class="fa fa-table me-2"></i>To Do List</a>
+            @endcan
         </div>
     </nav>
 </div>

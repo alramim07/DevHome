@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\DevController;
 use App\Http\Controllers\Admin\EmailController;
 use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\TeamRequest;
+use App\Http\Controllers\Admin\TeamManagementController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\TeamController;
 use App\Http\Controllers\Admin\ProjectController;
@@ -100,6 +101,25 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/join-list', [TeamRequest::class, 'index'])->name('join.list')->middleware('section:join_requests');
     Route::delete('/join-delete/{id}', [TeamRequest::class, 'destroy'])->name('join.delete')->middleware('section:join_requests');
+
+    // Team Management (section:team_management; position writes are
+    // additionally restricted to the super admin inside the controller).
+    Route::middleware('section:team_management')->group(function () {
+        Route::get('/positions', [TeamManagementController::class, 'positions'])->name('team.positions');
+        Route::post('/positions', [TeamManagementController::class, 'storePosition'])->name('team.positions.store');
+        Route::post('/positions/{position}/update', [TeamManagementController::class, 'updatePosition'])->name('team.positions.update');
+        Route::post('/positions/{position}/delete', [TeamManagementController::class, 'destroyPosition'])->name('team.positions.delete');
+
+        Route::get('/teams', [TeamManagementController::class, 'teams'])->name('team.teams');
+        Route::post('/teams', [TeamManagementController::class, 'storeTeam'])->name('team.teams.store');
+        Route::post('/teams/{team}/update', [TeamManagementController::class, 'updateTeam'])->name('team.teams.update');
+        Route::post('/teams/{team}/delete', [TeamManagementController::class, 'destroyTeam'])->name('team.teams.delete');
+        Route::post('/teams/{team}/members', [TeamManagementController::class, 'addMember'])->name('team.teams.members.add');
+        Route::post('/teams/{team}/members/{userId}/remove', [TeamManagementController::class, 'removeMember'])->name('team.teams.members.remove');
+
+        // All Members — replaced in Task 5; redirect keeps the sidebar link working now.
+        Route::get('/members', fn () => redirect()->route('team.positions'))->name('team.members');
+    });
 
     Route::get('/notifications/feed', [NotificationController::class, 'feed'])->name('notifications.feed');
     Route::post('/notifications/mark-read', [NotificationController::class, 'markAllRead'])->name('notifications.mark-read');
