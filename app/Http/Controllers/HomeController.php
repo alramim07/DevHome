@@ -41,7 +41,7 @@ class HomeController extends Controller
         $ip = $request->ip();
         $settings = Website_settings::first();
 
-        $alreadyViewed = ProjectView::where('projects_id', $projects->id)
+        $alreadyViewed = ProjectView::where('project_id', $projects->id)
             ->where('ip_address', $ip)
             ->where('created_at', '>=', Carbon::now()->subDays(30))
             ->exists();
@@ -50,7 +50,7 @@ class HomeController extends Controller
             $projects->increment('views');
 
             ProjectView::create([
-                'projects_id' => $projects->id,
+                'project_id' => $projects->id,
                 'ip_address' => $ip,
             ]);
         }
