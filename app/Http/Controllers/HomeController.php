@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\ContactRequest;
 use App\Http\Requests\ProjectContactRequest;
+use App\Models\Blog;
 use App\Models\Contact;
 use App\Models\Email;
 use App\Models\Projects;
@@ -58,6 +59,27 @@ class HomeController extends Controller
         $user = User::where('id', $projects->user_id)->firstOrFail();
 
         return view('front.layouts.home.project', compact('projects', 'user', 'settings'));
+    }
+
+    /**
+     * Public single blog post (published only). Drafts, unknown slugs and a
+     * /blog index all 404 — the blog has no public listing by design.
+     */
+    public function blogShow($slug)
+    {
+        $blog = Blog::published()->where('slug', $slug)->firstOrFail();
+
+        $settings = Website_settings::first();
+
+        $suggested = Blog::published()
+            ->where('id', '!=', $blog->id)
+            ->latest('published_at')
+            ->take(3)
+            ->get();
+
+        $author = User::withTrashed()->find($blog->user_id);
+
+        return view('front.layouts.home.blog', compact('blog', 'settings', 'suggested', 'author'));
     }
 
     public function submit(ContactRequest $request)

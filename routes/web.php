@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\EmailController;
 use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\TeamRequest;
 use App\Http\Controllers\Admin\TeamManagementController;
+use App\Http\Controllers\Admin\BlogAdminController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\TeamController;
 use App\Http\Controllers\Admin\ProjectController;
@@ -19,6 +20,9 @@ use App\Http\Controllers\Admin\NotificationController;
 Route::controller(HomeController::class)->group(function () {
     Route::get('/', 'index')->name('home');
     Route::get('/project/{slug}',  'project')->name('project.view');
+    // Blog: single published post only. There is intentionally NO GET /blog
+    // index route — /blog and unknown/draft slugs 404.
+    Route::get('/blog/{slug}', 'blogShow')->name('front.blog');
     Route::POST('/contact-us', 'submit')->name('contact.submit')->middleware('throttle:contact');
     Route::POST('/contact-me',  'contactMe')->name('email.submit')->middleware('throttle:contact');
 });
@@ -127,6 +131,16 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/notifications/feed', [NotificationController::class, 'feed'])->name('notifications.feed');
     Route::post('/notifications/mark-read', [NotificationController::class, 'markAllRead'])->name('notifications.mark-read');
+
+    // Blog admin (mirrors Projects: Add Blog + Blog List).
+    Route::middleware('section:blog')->group(function () {
+        Route::get('/add-blog', [BlogAdminController::class, 'create'])->name('blog.create');
+        Route::post('/add-blog', [BlogAdminController::class, 'store'])->name('blog.store');
+        Route::get('/blog-list', [BlogAdminController::class, 'list'])->name('blog.list');
+        Route::get('/edit-blog/{id}', [BlogAdminController::class, 'edit'])->name('blog.edit');
+        Route::post('/edit-blog/{id}/update', [BlogAdminController::class, 'update'])->name('blog.update');
+        Route::post('/blog-list/{id}/delete', [BlogAdminController::class, 'destroy'])->name('blog.destroy');
+    });
 
     // TEMP DEBUG ROUTE - remove after fixing
     Route::get('/debug-dashboard', function () {

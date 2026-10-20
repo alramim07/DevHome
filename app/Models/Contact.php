@@ -10,6 +10,7 @@ class Contact extends Model
         'first_name',
         'last_name',
         'email',
+        'subject',
         'message',
         'phone_number'
     ];
