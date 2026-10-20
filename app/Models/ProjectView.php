@@ -6,11 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class ProjectView extends Model
 {
-    protected $fillable = ['projects_id' , 'ip_address'];
+    protected $fillable = ['project_id', 'ip_address'];
 
     public function project()
     {
         
-        return $this->belongsTo(Projects::class, 'projects_id');
+        return $this->belongsTo(Projects::class, 'project_id');
     }
 }
