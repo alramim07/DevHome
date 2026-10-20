@@ -15,6 +15,12 @@ class TeamController extends Controller
     {
         try {
             $user = User::where('slug', $slug)->firstOrFail();
+            
+            // Hide super admin from public team pages
+            if ($user->role === 'super_admin') {
+                abort(404, 'Team member not found');
+            }
+            
             $projects = Projects::where('user_id', $user->id)->get();
             
             $homeData = $homeService->getHomeData($request);
