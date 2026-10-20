@@ -14,12 +14,6 @@ class WebsiteSettingsController extends Controller
     {
         $stats = $service->getStats(Auth::user());
         $stats['settings'] = $stats['siteSettings'];
-        if ($stats['user']->id !== 1) {
-            return response()->view('admin.403_redirect', [
-                'message' => 'Unauthorized action. Redirecting to dashboard...',
-                'url' => route('dashboard'),
-            ], 403);
-        }
 
         return view('admin.website_settings', $stats);
     }

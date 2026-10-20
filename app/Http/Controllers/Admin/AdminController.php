@@ -53,13 +53,6 @@ class AdminController extends Controller
     public function contacts(DashboardService $service)
     {
         $stats = $service->getStats(Auth::user());
-        $superAdmin = Auth::user()->id === 1;
-        if (!$superAdmin) {
-            return response()->view('admin.403_redirect', [
-                'message' => 'Unauthorized action. Redirecting to dashboard...',
-                'url' => route('dashboard'), 
-            ], 403);
-        }
         return view('admin.contacts', $stats);
     }
 

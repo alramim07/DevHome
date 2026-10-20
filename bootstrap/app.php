@@ -16,6 +16,10 @@ return Application::configure(basePath: dirname(__DIR__))
         // required for per-visitor rate limiting.
         $middleware->trustProxies(at: '*');
 
+        $middleware->alias([
+            'section' => \App\Http\Middleware\EnsureSectionAccess::class,
+        ]);
+
         $middleware->web(append: [
             \App\Http\Middleware\SecurityHeaders::class,
         ]);

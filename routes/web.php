@@ -60,7 +60,7 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/project-image-upload', [HomeController::class, 'uploadEditorImage'])
         ->name('project.image.upload')
-        ->middleware('throttle:uploads');
+        ->middleware(['section:projects', 'throttle:uploads']);
 
     Route::get('/dashboard', [AdminController::class, 'index'])->name('dashboard');
 
@@ -68,24 +68,24 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/profile-update', [ProfileController::class, 'update'])->name('profile.update');
 
-    Route::get('/add-project', [ProjectController::class, 'index'])->name('add.project');
+    Route::get('/add-project', [ProjectController::class, 'index'])->name('add.project')->middleware('section:projects');
 
-    Route::post('/store-project', [ProjectController::class, 'store'])->name('store.project');
+    Route::post('/store-project', [ProjectController::class, 'store'])->name('store.project')->middleware('section:projects');
 
-    Route::get('/edit-project/{slug}', [ProjectController::class, 'edit'])->name('edit.project');
+    Route::get('/edit-project/{slug}', [ProjectController::class, 'edit'])->name('edit.project')->middleware('section:projects');
 
-    Route::post('/update-project/{slug}', [ProjectController::class, 'update'])->name('update.project');
+    Route::post('/update-project/{slug}', [ProjectController::class, 'update'])->name('update.project')->middleware('section:projects');
 
-    Route::get('/project-list', [ProjectController::class, 'list'])->name('list.project');
+    Route::get('/project-list', [ProjectController::class, 'list'])->name('list.project')->middleware('section:projects');
 
-    Route::post('/project-delete/{slug}', [ProjectController::class, 'destroy'])->name('projects.destroy');
+    Route::post('/project-delete/{slug}', [ProjectController::class, 'destroy'])->name('projects.destroy')->middleware('section:projects');
 
-    Route::get('/website-settings', [WebsiteSettingsController::class, 'index'])->name('website.settings');
-    Route::post('/website/update', [WebsiteSettingsController::class, 'update'])->name('website.update');
+    Route::get('/website-settings', [WebsiteSettingsController::class, 'index'])->name('website.settings')->middleware('section:website_settings');
+    Route::post('/website/update', [WebsiteSettingsController::class, 'update'])->name('website.update')->middleware('section:website_settings');
 
-    Route::get('/email-list', [EmailController::class, 'index'])->name('email.list');
+    Route::get('/email-list', [EmailController::class, 'index'])->name('email.list')->middleware('section:email_list');
 
-    Route::get('/website-contacts', [AdminController::class, 'contacts'])->name('website.contacts');
+    Route::get('/website-contacts', [AdminController::class, 'contacts'])->name('website.contacts')->middleware('section:website_contacts');
 
     Route::get('/add-dev', [DevController::class, 'addDevView'])->name('add.dev');
     Route::post('/add-dev', [DevController::class, 'addDev'])->name('add.dev.post');
@@ -94,12 +94,12 @@ Route::middleware('auth')->group(function () {
     Route::get('/remove-dev/{id}', [DevController::class, 'remove'])->name('remove.dev');
     Route::post('/remove-dev-ajax/{id}', [DevController::class, 'removeAjax'])->name('remove.dev.ajax');
 
-    Route::get('/todo', [TodoController::class, 'index'])->name('todo');
-    Route::post('/todo/store', [TodoController::class, 'store'])->name('todo.store');
-    Route::delete('/todo/delete/{id}', [TodoController::class, 'destroy'])->name('todo.delete');
+    Route::get('/todo', [TodoController::class, 'index'])->name('todo')->middleware('section:todo');
+    Route::post('/todo/store', [TodoController::class, 'store'])->name('todo.store')->middleware('section:todo');
+    Route::delete('/todo/delete/{id}', [TodoController::class, 'destroy'])->name('todo.delete')->middleware('section:todo');
 
-    Route::get('/join-list', [TeamRequest::class, 'index'])->name('join.list');
-    Route::delete('/join-delete/{id}', [TeamRequest::class, 'destroy'])->name('join.delete');
+    Route::get('/join-list', [TeamRequest::class, 'index'])->name('join.list')->middleware('section:join_requests');
+    Route::delete('/join-delete/{id}', [TeamRequest::class, 'destroy'])->name('join.delete')->middleware('section:join_requests');
 
     Route::get('/notifications/feed', [NotificationController::class, 'feed'])->name('notifications.feed');
     Route::post('/notifications/mark-read', [NotificationController::class, 'markAllRead'])->name('notifications.mark-read');

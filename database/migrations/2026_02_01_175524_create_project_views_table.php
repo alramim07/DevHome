@@ -13,9 +13,11 @@ return new class extends Migration
     {
         Schema::create('project_views', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('projects_id')->constrained()->onDelete('cascade');
+            $table->foreignId('project_id')->constrained()->onDelete('cascade');
             $table->string('ip_address');
             $table->timestamps();
+            // Dedup window + dashboard "today's views" queries use viewed_at.
+            $table->timestamp('viewed_at')->nullable()->useCurrent()->index();
         });
     }
 

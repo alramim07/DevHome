@@ -2,8 +2,10 @@
 
 namespace App\Providers;
 
+use App\Models\User;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
@@ -27,6 +29,12 @@ class AppServiceProvider extends ServiceProvider
         if ($this->app->isProduction() && !$this->app->runningInConsole()) {
             URL::forceScheme('https');
         }
+
+        // Section permission gate — used by the `section` route middleware and
+        // by @can('section', 'x') checks in the admin sidebar/views.
+        Gate::define('section', function (User $user, string $section) {
+            return $user->canAccess($section);
+        });
 
         $this->registerRateLimiters();
     }

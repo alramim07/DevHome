@@ -58,7 +58,7 @@ class SecurityHardeningTest extends TestCase
 
     public function test_authenticated_user_cannot_upload_non_image(): void
     {
-        $user = \App\Models\User::factory()->create();
+        $user = \App\Models\User::factory()->create(['permissions' => ['projects']]);
 
         $this->actingAs($user)
             ->postJson(route('project.image.upload'), ['upload' => UploadedFile::fake()->create('shell.php', 10, 'text/plain')])
@@ -110,7 +110,7 @@ class SecurityHardeningTest extends TestCase
     public function test_authenticated_user_can_upload_a_real_image(): void
     {
         \Illuminate\Support\Facades\Storage::fake('public');
-        $user = \App\Models\User::factory()->create();
+        $user = \App\Models\User::factory()->create(['permissions' => ['projects']]);
 
         $this->actingAs($user)->postJson(route('project.image.upload'), [
             'upload' => UploadedFile::fake()->image('shot.jpg', 10, 10),
