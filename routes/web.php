@@ -141,19 +141,4 @@ Route::middleware('auth')->group(function () {
         Route::post('/edit-blog/{id}/update', [BlogAdminController::class, 'update'])->name('blog.update');
         Route::post('/blog-list/{id}/delete', [BlogAdminController::class, 'destroy'])->name('blog.destroy');
     });
-
-    // TEMP DEBUG ROUTE - remove after fixing
-    Route::get('/debug-dashboard', function () {
-        try {
-            $service = app(App\Services\DashboardService::class);
-            $stats = $service->getStats(auth()->user());
-            return response()->json(['success' => true, 'stats_keys' => array_keys($stats)]);
-        } catch (Exception $e) {
-            return response()->json([
-                'success' => false,
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-            ], 500);
-        }
-    })->middleware('auth');
 });

@@ -27,6 +27,7 @@
             </a>
 
             {{-- Projects Dropdown --}}
+            @can('section', 'projects')
             <div class="nav-item dropdown">
                 {{-- Parent is 'active' if any project route is visited --}}
                 <a href="#"
@@ -45,6 +46,27 @@
                         List</a>
                 </div>
             </div>
+            @endcan
+
+            {{-- Blog Dropdown --}}
+            @can('section', 'blog')
+            <div class="nav-item dropdown">
+                <a href="#"
+                    class="nav-link dropdown-toggle {{ request()->routeIs(['blog.create', 'blog.list', 'blog.edit']) ? 'active' : '' }}"
+                    data-bs-toggle="dropdown">
+                    <i class="fa fa-newspaper me-2"></i>Blog
+                </a>
+                <div
+                    class="dropdown-menu bg-transparent border-0 {{ request()->routeIs(['blog.create', 'blog.list', 'blog.edit']) ? 'show' : '' }}">
+                    <a href="{{ route('blog.create') }}"
+                        class="dropdown-item {{ request()->routeIs('blog.create') ? 'active text-primary' : '' }}">Add
+                        Blog</a>
+                    <a href="{{ route('blog.list') }}"
+                        class="dropdown-item {{ request()->routeIs(['blog.list', 'blog.edit']) ? 'active text-primary' : '' }}">Blog
+                        List</a>
+                </div>
+            </div>
+            @endcan
 
             @can('section', 'website_settings')
             <a href="{{ route('website.settings') }}"
