@@ -176,6 +176,11 @@
     background: var(--dark);
 }
 
+/* Fix dropdown menu overflow in sidebar */
+.sidebar .navbar .dropdown-menu {
+    overflow: visible;
+}
+
 .content .navbar .navbar-nav .nav-link {
     margin-left: 25px;
     padding: 12px 0;
