@@ -87,9 +87,8 @@
 
     <!-- Template Javascript -->
     <script src="{{ asset('admin/js/main.js') }}"></script>
-    <!-- Text Editor -->
-    <script src="https://cdn.tiny.cloud/1/kry2se120hc758lhd20l2wf5axnnixf8pf4x0fve6lewmlay/tinymce/8/tinymce.min.js"
-        referrerpolicy="origin" crossorigin="anonymous"></script>
+    <!-- Text Editor (Self-hosted TinyMCE) -->
+    <script src="{{ asset('tinymce/js/tinymce/tinymce.min.js') }}"></script>
     <script>
         tinymce.init({
             selector: 'textarea#description',
