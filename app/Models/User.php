@@ -14,6 +14,35 @@ class User extends Authenticatable
     use HasFactory, Notifiable, SoftDeletes;
 
     /**
+     * Canonical list of grantable admin sections. Single source of truth,
+     * consumed by the section middleware, the position preset editor, the
+     * per-member permission editor, and the seeders.
+     */
+    public const array SECTIONS = [
+        'projects',
+        'blog',
+        'team_management',
+        'website_settings',
+        'website_contacts',
+        'join_requests',
+        'email_list',
+        'todo',
+    ];
+
+    public const array SECTIONS_LABELS = [
+        'projects' => 'Projects',
+        'blog' => 'Blog',
+        'team_management' => 'Team Management',
+        'website_settings' => 'Website Settings',
+        'website_contacts' => 'Website Contacts',
+        'join_requests' => 'Join Requests',
+        'email_list' => 'E-mails',
+        'todo' => 'To Do List',
+    ];
+
+    public const array ROLES = ['super_admin', 'admin', 'member'];
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var list<string>
@@ -30,11 +59,15 @@ class User extends Authenticatable
         'experience',
         'slug',
         'custom_cv',
+        'role',
+        'position_id',
+        'permissions',
 
     ];
 
     protected $casts = [
         'languages' => 'array',
+        'permissions' => 'array',
     ];
     /**
      * The attributes that should be hidden for serialization.
@@ -62,6 +95,38 @@ class User extends Authenticatable
     public function emails() {
     return $this->hasMany(Email::class);
 }
+
+    public function position()
+    {
+        return $this->belongsTo(Position::class);
+    }
+
+    public function teams()
+    {
+        return $this->belongsToMany(Team::class);
+    }
+
+    /**
+     * Whether this user holds the super admin role.
+     */
+    public function isSuperAdmin(): bool
+    {
+        return $this->role === 'super_admin';
+    }
+
+    /**
+     * Check whether this user may access a grantable admin section.
+     * Super admins always can; everyone else needs the section granted
+     * in their (per-user) permissions list.
+     */
+    public function canAccess(string $section): bool
+    {
+        if ($this->isSuperAdmin()) {
+            return true;
+        }
+
+        return in_array($section, $this->permissions ?? [], true);
+    }
 
 public function getRouteKeyName()
 {
