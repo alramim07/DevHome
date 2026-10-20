@@ -7,6 +7,7 @@ use App\Models\Blog;
 use App\Services\DashboardService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 
 class BlogAdminController extends Controller
@@ -37,6 +38,9 @@ class BlogAdminController extends Controller
         }
 
         $blog->save();
+
+        // Clear sitemap cache
+        Cache::forget('sitemap');
 
         return redirect()->route('blog.list')->with('success', 'Blog post created successfully!');
     }
@@ -84,6 +88,9 @@ class BlogAdminController extends Controller
 
         $blog->save();
 
+        // Clear sitemap cache
+        Cache::forget('sitemap');
+
         return redirect()->route('blog.list')->with('success', 'Blog post updated successfully!');
     }
 
@@ -96,6 +103,9 @@ class BlogAdminController extends Controller
         }
 
         $blog->delete();
+
+        // Clear sitemap cache
+        Cache::forget('sitemap');
 
         return redirect()->route('blog.list')->with('success', 'Blog post deleted successfully!');
     }

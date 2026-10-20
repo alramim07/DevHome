@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\TodoController;
 use App\Http\Controllers\Admin\WebsiteSettingsController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CVController;
+use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\Admin\NotificationController;
 
 
@@ -38,6 +39,9 @@ Route::controller(CVController::class)->group(function () {
 
     Route::get('/cv/custom/{slug}', 'downloadCustom')->name('cv.custom');
 });
+
+// Dynamic Sitemap (public, no auth)
+Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
 
 
 

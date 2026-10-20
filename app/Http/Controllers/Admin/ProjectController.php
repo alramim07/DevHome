@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Projects;
 use App\Services\DashboardService;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -50,6 +51,10 @@ class ProjectController extends Controller
         }
 
         $project->save();
+        
+        // Clear sitemap cache
+        Cache::forget('sitemap');
+        
         return redirect()->route('list.project')->with('success', 'Project Updated Successfully!');
     }
 
@@ -99,6 +104,10 @@ class ProjectController extends Controller
         }
 
         $project->save();
+        
+        // Clear sitemap cache
+        Cache::forget('sitemap');
+        
         return redirect()->route('list.project')->with('success', 'Project Updated Successfully!');
     }
 
@@ -109,7 +118,10 @@ class ProjectController extends Controller
             Storage::disk('public')->delete(media_path($project->thumbnail));
         }
         $project->delete();
-
+        
+        // Clear sitemap cache
+        Cache::forget('sitemap');
+        
         return redirect()->route('list.project')->with('success', 'Project removed successfully.');
     }
 }
