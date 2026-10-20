@@ -21,6 +21,9 @@ use App\Http\Controllers\Admin\NotificationController;
 // FrontEnd
 Route::controller(HomeController::class)->group(function () {
     Route::get('/', 'index')->name('home');
+    Route::get('/test-simple', function () {
+        return response('OK', 200)->header('Content-Type', 'text/plain');
+    });
     Route::get('/project/{slug}',  'project')->name('project.view');
     // Blog: single published post only. There is intentionally NO GET /blog
     // index route — /blog and unknown/draft slugs 404.
