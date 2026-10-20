@@ -24,6 +24,23 @@ Route::controller(HomeController::class)->group(function () {
     Route::get('/test-simple', function () {
         return response('OK', 200)->header('Content-Type', 'text/plain');
     });
+    Route::get('/test-db', function () {
+        try {
+            $count = \App\Models\Projects::count();
+            return response("DB OK: $count projects", 200)->header('Content-Type', 'text/plain');
+        } catch (\Throwable $e) {
+            return response("DB ERROR: " . $e->getMessage(), 500)->header('Content-Type', 'text/plain');
+        }
+    });
+    Route::get('/test-service', function () {
+        try {
+            $service = app(\App\Services\HomeService::class);
+            $data = $service->getHomeData(request());
+            return response("Service OK: " . count($data['projects']) . " projects", 200)->header('Content-Type', 'text/plain');
+        } catch (\Throwable $e) {
+            return response("Service ERROR: " . $e->getMessage() . "\n" . $e->getTraceAsString(), 500)->header('Content-Type', 'text/plain');
+        }
+    });
     Route::get('/project/{slug}',  'project')->name('project.view');
     // Blog: single published post only. There is intentionally NO GET /blog
     // index route — /blog and unknown/draft slugs 404.
