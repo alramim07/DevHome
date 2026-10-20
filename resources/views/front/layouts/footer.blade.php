@@ -120,10 +120,17 @@
           <p class="xa">
             Send your portfolio or github profile link here.
           </p>
-          <form class="k xa oc ke me" method="POST" action="{{ route('team.request') }}">
+
+          {{-- Success Alert --}}
+          <div id="join-success-alert" style="display:none; align-items:center; justify-content:space-between; background:#1a3a2a; border:1px solid #2ecc71; border-radius:8px; padding:10px 14px; margin-bottom:12px; color:#2ecc71; font-size:14px;">
+            <span>✅ Request sent successfully!</span>
+            <button onclick="document.getElementById('join-success-alert').style.display='none'" style="background:none; border:none; color:#2ecc71; font-size:18px; cursor:pointer; line-height:1; padding:0 0 0 12px;">&times;</button>
+          </div>
+
+          <form id="join-form" class="k xa oc ke me" method="POST" action="{{ route('team.request') }}">
             @csrf
-            <input type="text" name="name" placeholder="Your Name" class="cj dc oc me ve ye gj cf hj zf fh ki dj" />
-            <input type="url" name="link" placeholder="Your Portfolio or Github Link" class="cj dc oc me ve ye gj cf hj zf fh ki dj" />
+            <input type="text" name="name" id="join-name" placeholder="Your Name" class="cj dc oc me ve ye gj cf hj zf fh ki dj" />
+            <input type="url" name="link" id="join-link" placeholder="Your Portfolio or Github Link" class="cj dc oc me ve ye gj cf hj zf fh ki dj" />
             <button type="submit" class="bf wi j o n sb ec wc xd yd _h">
               <svg width="18" height="13" viewBox="0 0 18 13" class="jf">
                 <path
@@ -131,6 +138,29 @@
               </svg>
             </button>
           </form>
+
+          <script>
+            document.getElementById('join-form').addEventListener('submit', function (e) {
+              e.preventDefault();
+
+              const form = this;
+              const formData = new FormData(form);
+
+              // Show success instantly
+              document.getElementById('join-success-alert').style.display = 'flex';
+
+              // Clear fields instantly
+              document.getElementById('join-name').value = '';
+              document.getElementById('join-link').value = '';
+
+              // Submit in background
+              fetch(form.action, {
+                method: 'POST',
+                headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+                body: formData
+              });
+            });
+          </script>
           <p>&copy;Copywright by DevHome 2026 </p>
         </div>
       </div>

@@ -38,6 +38,10 @@ class TeamController extends Controller
             'url'     => route('join.list'),
         ]);
 
+        if ($request->expectsJson()) {
+            return response()->json(['success' => true, 'message' => 'Request sent successfully']);
+        }
+
         return redirect()->back()->with('success', 'Request sent successfully');
     }
 }
