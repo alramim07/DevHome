@@ -18,7 +18,7 @@ class User extends Authenticatable
      * consumed by the section middleware, the position preset editor, the
      * per-member permission editor, and the seeders.
      */
-    public const array SECTIONS = [
+    public const SECTIONS = [
         'projects',
         'blog',
         'team_management',
@@ -29,7 +29,7 @@ class User extends Authenticatable
         'todo',
     ];
 
-    public const array SECTIONS_LABELS = [
+    public const SECTIONS_LABELS = [
         'projects' => 'Projects',
         'blog' => 'Blog',
         'team_management' => 'Team Management',
@@ -40,7 +40,7 @@ class User extends Authenticatable
         'todo' => 'To Do List',
     ];
 
-    public const array ROLES = ['super_admin', 'admin', 'member'];
+    public const ROLES = ['super_admin', 'admin', 'member'];
 
     /**
      * The attributes that are mass assignable.
