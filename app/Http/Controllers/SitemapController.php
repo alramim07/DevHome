@@ -6,7 +6,6 @@ use App\Models\Projects;
 use App\Models\Blog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\URL;
 
 class SitemapController extends Controller
 {
@@ -26,16 +25,15 @@ class SitemapController extends Controller
         $baseUrl = rtrim(config('app.url'), '/');
         $urls = [];
 
-        // Static pages (always accessible)
-        $staticPages = [
-            ['url' => $baseUrl, 'changefreq' => 'daily', 'priority' => '1.0'],
-            ['url' => $baseUrl . '/login', 'changefreq' => 'monthly', 'priority' => '0.3'],
-            ['url' => $baseUrl . '/team', 'changefreq' => 'weekly', 'priority' => '0.5'], // Team listing page
-        ];
+        // ONLY include: Homepage + Published Projects + Published Blogs
+        // NO dashboard, login, team, admin, or other internal URLs
 
-        foreach ($staticPages as $page) {
-            $urls[] = $this->buildUrlEntry($page);
-        }
+        // Homepage
+        $urls[] = $this->buildUrlEntry([
+            'url' => $baseUrl,
+            'changefreq' => 'daily',
+            'priority' => '1.0',
+        ]);
 
         // Published Projects
         $projects = Projects::whereNotNull('slug')
@@ -71,9 +69,6 @@ class SitemapController extends Controller
                 'priority' => '0.7',
             ]);
         }
-
-        // Team member public pages (if team slug route exists)
-        // Only include if you have a public team member view route
 
         $xml = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
         $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"' . "\n";
