@@ -73,35 +73,13 @@
                     <td class="text-end">
                         <button class="btn btn-sm btn-outline-info" data-bs-toggle="modal"
                             data-bs-target="#editTeam{{ $team->id }}">Rename</button>
-                        <form action="{{ route('team.teams.delete', $team) }}" method="POST" class="d-inline"
-                            onsubmit="return confirm('Delete team {{ $team->name }}? Members stay in the system.')">
+                        <form action="{{ route('team.teams.delete', $team) }}" method="POST" class="d-inline form-delete-team"
+                            data-name="{{ $team->name }}">
                             @csrf
-                            <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                            <button type="button" class="btn btn-sm btn-outline-danger btn-delete-team">Delete</button>
                         </form>
                     </td>
                 </tr>
-
-                {{-- Rename modal --}}
-                <div class="modal fade" id="editTeam{{ $team->id }}" tabindex="-1">
-                    <div class="modal-dialog">
-                        <form action="{{ route('team.teams.update', $team) }}" method="POST" class="modal-content">
-                            @csrf
-                            <div class="modal-header">
-                                <h6 class="modal-title">Rename team</h6>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                            </div>
-                            <div class="modal-body">
-                                <input type="text" name="name" class="form-control" value="{{ $team->name }}"
-                                    required>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary"
-                                    data-bs-dismiss="modal">Cancel</button>
-                                <button type="submit" class="btn btn-primary">Save</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
                 @empty
                 <tr>
                     <td colspan="5" class="text-center text-muted">No teams yet — create your first one above.</td>
@@ -109,6 +87,55 @@
                 @endforelse
             </tbody>
         </table>
+
+        {{-- Rename modals (placed outside the table) --}}
+        @foreach ($teams as $team)
+        <div class="modal fade" id="editTeam{{ $team->id }}" tabindex="-1" aria-labelledby="editTeamLabel{{ $team->id }}" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <form action="{{ route('team.teams.update', $team) }}" method="POST" class="modal-content bg-secondary text-white border-0 shadow">
+                    @csrf
+                    <div class="modal-header border-bottom border-dark">
+                        <h6 class="modal-title text-white" id="editTeamLabel{{ $team->id }}">Rename team</h6>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <label class="form-label text-white">Team name</label>
+                        <input type="text" name="name" class="form-control text-white bg-dark border-dark" value="{{ $team->name }}"
+                            required>
+                    </div>
+                    <div class="modal-footer border-top border-dark">
+                        <button type="button" class="btn btn-secondary"
+                            data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        @endforeach
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+    $(document).ready(function () {
+        $('.btn-delete-team').on('click', function (e) {
+            e.preventDefault();
+            let form = $(this).closest('form');
+            let name = form.data('name');
+
+            Swal.fire({
+                title: 'Delete Team?',
+                text: 'Delete team ' + name + '? Members stay in the system.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            });
+        });
+    });
+</script>
+@endpush
