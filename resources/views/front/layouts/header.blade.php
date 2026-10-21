@@ -80,12 +80,13 @@
                   <stop offset="100%" stop-color="#FF6F00" />
                 </linearGradient>
 
-                <!-- Moon Core: soft silvery pearl to delicate lunar slate -->
-                <radialGradient id="celestialMoonGrad" cx="30%" cy="35%" r="70%">
-                  <stop offset="0%" stop-color="#FFFFFF" />
-                  <stop offset="35%" stop-color="#F8FAFC" />
-                  <stop offset="70%" stop-color="#CBD5E1" />
-                  <stop offset="100%" stop-color="#94A3B8" />
+                <!-- Moon Core: rich luminous pearl to deep slate/indigo for high contrast against white mode -->
+                <radialGradient id="celestialMoonGrad" cx="25%" cy="30%" r="75%">
+                  <stop offset="0%" stop-color="#FFFDE7" />
+                  <stop offset="20%" stop-color="#F8FAFC" />
+                  <stop offset="50%" stop-color="#94A3B8" />
+                  <stop offset="80%" stop-color="#475569" />
+                  <stop offset="100%" stop-color="#334155" />
                 </radialGradient>
 
                 <!-- Eclipse Shadow Mask: slides across the central sphere -->
@@ -118,17 +119,18 @@
                         :style="darkMode ? 'opacity: 1;' : 'opacity: 0;'"
                         cx="18" cy="18" r="8.5" fill="url(#celestialSunGrad)" />
 
-                <!-- Moon Body (shown in Light mode) -->
+                <!-- Moon Body (shown in Light mode: deep defining stroke and rich lunar gradient) -->
                 <circle class="celestial-moon-body"
                         :style="darkMode ? 'opacity: 0;' : 'opacity: 1;'"
-                        cx="18" cy="18" r="8.5" fill="url(#celestialMoonGrad)" />
+                        cx="18" cy="18" r="8.5" fill="url(#celestialMoonGrad)"
+                        stroke="#334155" stroke-width="0.8" />
 
-                <!-- Lunar Surface Details / Craters -->
+                <!-- Lunar Surface Details / Craters (prominent contrast in Light mode) -->
                 <g class="celestial-craters"
                    :style="darkMode ? 'opacity: 0; transform: scale(0.5);' : 'opacity: 1; transform: scale(1);'">
-                  <circle cx="14" cy="18" r="1.3" fill="#64748B" opacity="0.35" />
-                  <circle cx="16.5" cy="22" r="1.0" fill="#64748B" opacity="0.3" />
-                  <circle cx="15.5" cy="14" r="0.8" fill="#64748B" opacity="0.25" />
+                  <circle cx="13.5" cy="18" r="1.4" fill="#1E293B" opacity="0.5" />
+                  <circle cx="16.5" cy="22.5" r="1.1" fill="#1E293B" opacity="0.45" />
+                  <circle cx="15.2" cy="13.8" r="0.9" fill="#1E293B" opacity="0.4" />
                 </g>
               </g>
             </svg>
@@ -173,7 +175,11 @@
     }
 
     .celestial-svg.is-moon {
-      filter: drop-shadow(0 0 5px rgba(148, 163, 184, 0.7)) drop-shadow(0 0 12px rgba(203, 213, 225, 0.45));
+      filter: drop-shadow(0 3px 6px rgba(15, 23, 42, 0.45)) drop-shadow(0 1px 2px rgba(15, 23, 42, 0.3)) drop-shadow(0 0 1px rgba(15, 23, 42, 0.6));
+    }
+
+    .celestial-toggle-btn:hover .celestial-svg.is-moon {
+      filter: drop-shadow(0 4px 10px rgba(15, 23, 42, 0.6)) drop-shadow(0 1px 3px rgba(15, 23, 42, 0.4)) drop-shadow(0 0 2px rgba(15, 23, 42, 0.8));
     }
 
     .celestial-eclipse-disk {
