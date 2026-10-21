@@ -32,29 +32,37 @@
 </head>
 
 <body>
-  <div class="d-flex justify-content-center align-items-center vh-100">
-    <div class="col-sm-12 col-xl-6">
-      <div class="bg-secondary rounded h-100 p-4">
+  <div class="d-flex justify-content-center align-items-center min-vh-100 p-3">
+    <div class="col-12 col-sm-10 col-md-8 col-lg-6 col-xl-5">
+      <div class="bg-secondary rounded p-4 shadow">
         <h6 class="mb-4">Login To Dev Home</h6>
         <form action="{{ route('login.post') }}" method="POST">
           @csrf
           <div class="mb-3">
             <label for="exampleInputEmail1" class="form-label">Email address</label>
-            <input type="email" name="email" class="form-control @error('email') is-invalid @enderror"
-              id="exampleInputEmail1" aria-describedby="emailHelp">
+            <input type="email" name="email" value="{{ old('email') }}" class="form-control bg-dark text-white border-0 @error('email') is-invalid @enderror"
+              id="exampleInputEmail1" aria-describedby="emailHelp" required autofocus>
             @error('email')
-              <div class="alert alert-danger">{{ $message }}</div>
+              <div class="alert alert-danger mt-2">{{ $message }}</div>
             @enderror
           </div>
           <div class="mb-3">
             <label for="exampleInputPassword1" class="form-label">Password</label>
-            <input type="password" name="password" class="form-control @error('password') is-invalid @enderror" id="exampleInputPassword1">
-
-              @error('password')
-    <div class="alert alert-danger">{{ $message }}</div>
-@enderror
+            <div class="input-group">
+              <input type="password" name="password" class="form-control bg-dark text-white border-0 @error('password') is-invalid @enderror" id="exampleInputPassword1" required>
+              <button class="btn btn-dark border-0 toggle-password-btn" type="button" id="togglePasswordBtn" title="Show/Hide Password" style="cursor: pointer; color: #6c757d;">
+                <i class="fa fa-eye" id="togglePasswordIcon"></i>
+              </button>
+            </div>
+            @error('password')
+              <div class="alert alert-danger mt-2">{{ $message }}</div>
+            @enderror
           </div>
-          <button type="submit" class="btn btn-primary">Sign in</button>
+          <div class="mb-3 form-check d-flex align-items-center">
+            <input type="checkbox" name="remember" class="form-check-input mt-0" id="rememberMe">
+            <label class="form-check-label ms-2 text-muted" for="rememberMe" style="cursor: pointer; user-select: none;">Remember me</label>
+          </div>
+          <button type="submit" class="btn btn-primary w-100">Sign in</button>
         </form>
       </div>
     </div>
@@ -74,6 +82,22 @@
 
   <!-- Template Javascript -->
   <script src="{{ asset('admin/js/main.js') }}"></script>
+  <script>
+    $(document).ready(function() {
+      $('#togglePasswordBtn').on('click', function(e) {
+        e.preventDefault();
+        const input = $('#exampleInputPassword1');
+        const icon = $('#togglePasswordIcon');
+        if (input.attr('type') === 'password') {
+          input.attr('type', 'text');
+          icon.removeClass('fa-eye').addClass('fa-eye-slash text-primary');
+        } else {
+          input.attr('type', 'password');
+          icon.removeClass('fa-eye-slash text-primary').addClass('fa-eye');
+        }
+      });
+    });
+  </script>
 </body>
 
 </html>

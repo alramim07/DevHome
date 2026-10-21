@@ -155,6 +155,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/members/{userId}/edit', [TeamManagementController::class, 'editMember'])->name('team.members.edit');
         Route::post('/members/{userId}/update', [TeamManagementController::class, 'updateMember'])->name('team.members.update');
         Route::post('/members/{userId}/delete', [TeamManagementController::class, 'deleteMember'])->name('team.members.delete');
+        Route::post('/members/bulk-delete', [TeamManagementController::class, 'bulkDeleteMembers'])->name('team.members.bulk-delete');
+        Route::post('/members/{userId}/status', [TeamManagementController::class, 'updateStatus'])->name('team.members.status');
         Route::post('/members/{userId}/restore', [TeamManagementController::class, 'restoreMember'])->name('team.members.restore');
     });
 

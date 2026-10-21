@@ -26,3 +26,11 @@ Thumbs.db
 # Local tooling artifacts
 /.playwright-mcp
 /vendor.zip
+*.sql
+*.pem
+check_tables.php
+import_db*.php
+reset_*.php
+upload_images.php
+verify_production.php
+SITEMAP_IMPLEMENTATION.md

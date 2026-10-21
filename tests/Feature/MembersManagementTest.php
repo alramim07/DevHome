@@ -274,6 +274,76 @@ class MembersManagementTest extends TestCase
         );
     }
 
+    public function test_super_admin_can_delete_member_via_ajax(): void
+    {
+        $admin = $this->superAdmin();
+        $target = User::factory()->create(['role' => 'member']);
+
+        $res = $this->actingAs($admin)->postJson("/members/{$target->id}/delete");
+        $res->assertOk()->assertJson([
+            'success' => true,
+        ]);
+
+        $this->assertSoftDeleted('users', ['id' => $target->id]);
+    }
+
+    public function test_super_admin_can_bulk_delete_members(): void
+    {
+        $admin = $this->superAdmin();
+        $target1 = User::factory()->create(['role' => 'member']);
+        $target2 = User::factory()->create(['role' => 'member']);
+        $otherSuper = User::factory()->create(['role' => 'super_admin']);
+
+        $res = $this->actingAs($admin)->postJson('/members/bulk-delete', [
+            'ids' => [$target1->id, $target2->id, $admin->id, $otherSuper->id],
+        ]);
+
+        $res->assertOk()->assertJson([
+            'success' => true,
+            'deleted_count' => 2,
+        ]);
+
+        $this->assertSoftDeleted('users', ['id' => $target1->id]);
+        $this->assertSoftDeleted('users', ['id' => $target2->id]);
+        $this->assertNotSoftDeleted('users', ['id' => $admin->id]);
+        $this->assertNotSoftDeleted('users', ['id' => $otherSuper->id]);
+    }
+
+    public function test_super_admin_can_update_member_status(): void
+    {
+        $admin = $this->superAdmin();
+        $target = User::factory()->create(['role' => 'member', 'status' => 'active']);
+
+        $res = $this->actingAs($admin)->postJson("/members/{$target->id}/status", [
+            'status' => 'suspended',
+        ]);
+
+        $res->assertOk()->assertJson([
+            'success' => true,
+            'status' => 'suspended',
+            'status_label' => 'Suspanded',
+        ]);
+
+        $this->assertEquals('suspended', $target->fresh()->status);
+    }
+
+    public function test_suspended_user_cannot_login(): void
+    {
+        $user = User::factory()->create([
+            'email' => 'suspended@example.com',
+            'password' => 'secret123',
+            'status' => 'suspended',
+        ]);
+
+        $res = $this->post('/login', [
+            'email' => 'suspended@example.com',
+            'password' => 'secret123',
+        ]);
+
+        $res->assertSessionHasErrors(['email' => 'Your account has been suspended. Please contact the administrator.']);
+        $this->assertGuest();
+    }
+
     // ------------------------------------------------------------------
     // Old routes removed
     // ------------------------------------------------------------------

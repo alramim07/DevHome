@@ -198,7 +198,15 @@ class TeamManagementController extends Controller
         }
         if ($filters['status'] === 'deleted') {
             $query->onlyTrashed();
-        } elseif ($filters['status'] !== 'all') {
+        } elseif ($filters['status'] === 'suspended' || $filters['status'] === 'suspanded') {
+            $query->whereNull('deleted_at')->where('status', 'suspended');
+        } elseif ($filters['status'] === 'active_only') {
+            $query->whereNull('deleted_at')->where(function ($q) {
+                $q->where('status', 'active')->orWhereNull('status');
+            });
+        } elseif ($filters['status'] === 'all') {
+            // All records including trashed
+        } else {
             $query->whereNull('deleted_at');
         }
 
@@ -247,6 +255,7 @@ class TeamManagementController extends Controller
         $user->role = $data['role'];
         $user->position_id = $data['position_id'] ?? null;
         $user->permissions = $data['permissions'] ?? [];
+        $user->status = ($data['status'] ?? 'active') === 'suspanded' ? 'suspended' : ($data['status'] ?? 'active');
         $user->slug = $this->uniqueSlug($data['name']);
         if ($position = Position::find($data['position_id'] ?? null)) {
             $user->designation = $position->name;
@@ -312,6 +321,9 @@ class TeamManagementController extends Controller
         $user->role = $data['role'];
         $user->position_id = $data['position_id'] ?? null;
         $user->permissions = $data['permissions'] ?? [];
+        if (isset($data['status'])) {
+            $user->status = ($data['status'] === 'suspanded') ? 'suspended' : $data['status'];
+        }
         if (! empty($data['password'])) {
             $user->password = $data['password'];
         }
@@ -331,12 +343,15 @@ class TeamManagementController extends Controller
         return redirect()->route('team.members')->with('success', $user->name . ' updated successfully.');
     }
 
-    public function deleteMember($userId)
+    public function deleteMember(Request $request, $userId)
     {
         $user = User::findOrFail($userId);
         $actor = Auth::user();
 
         if (! $actor->isSuperAdmin()) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => 'Only the Super Admin can delete members.'], 403);
+            }
             return response()->view('admin.403_redirect', [
                 'message' => 'Only the Super Admin can delete members.',
                 'url' => route('dashboard'),
@@ -344,10 +359,16 @@ class TeamManagementController extends Controller
         }
 
         if ($actor->id === $user->id) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => 'You cannot delete yourself.'], 422);
+            }
             return redirect()->route('team.members')->with('error', 'You cannot delete yourself.');
         }
 
         if ($user->isSuperAdmin()) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => 'A Super Admin cannot delete another Super Admin.'], 403);
+            }
             return response()->view('admin.403_redirect', [
                 'message' => 'A Super Admin cannot delete another Super Admin.',
                 'url' => route('team.members'),
@@ -357,7 +378,84 @@ class TeamManagementController extends Controller
         $user->delete();
         Cache::forget('site.team');
 
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => $user->name . ' deleted successfully.',
+            ]);
+        }
+
         return redirect()->route('team.members')->with('success', $user->name . ' deleted.');
+    }
+
+    public function bulkDeleteMembers(Request $request)
+    {
+        $actor = Auth::user();
+
+        if (! $actor->isSuperAdmin()) {
+            return response()->json(['success' => false, 'message' => 'Only the Super Admin can delete members.'], 403);
+        }
+
+        $request->validate([
+            'ids' => ['required', 'array'],
+            'ids.*' => ['integer', 'exists:users,id'],
+        ]);
+
+        $ids = collect($request->input('ids', []))
+            ->reject(fn ($id) => (int) $id === (int) $actor->id)
+            ->all();
+
+        $users = User::whereIn('id', $ids)->get();
+        $deletedCount = 0;
+
+        foreach ($users as $user) {
+            if (! $user->isSuperAdmin()) {
+                $user->delete();
+                $deletedCount++;
+            }
+        }
+
+        Cache::forget('site.team');
+
+        return response()->json([
+            'success' => true,
+            'message' => "{$deletedCount} member(s) deleted successfully.",
+            'deleted_count' => $deletedCount,
+        ]);
+    }
+
+    public function updateStatus(Request $request, $userId)
+    {
+        $actor = Auth::user();
+
+        if (! $actor->isSuperAdmin()) {
+            return response()->json(['success' => false, 'message' => 'Only the Super Admin can change member status.'], 403);
+        }
+
+        $user = User::findOrFail($userId);
+
+        if ($actor->id === $user->id) {
+            return response()->json(['success' => false, 'message' => 'You cannot change your own status.'], 422);
+        }
+
+        if ($user->isSuperAdmin()) {
+            return response()->json(['success' => false, 'message' => 'Cannot modify Super Admin status.'], 403);
+        }
+
+        $request->validate([
+            'status' => ['required', 'string', 'in:active,suspended,suspanded'],
+        ]);
+
+        $status = strtolower($request->status) === 'suspanded' ? 'suspended' : strtolower($request->status);
+        $user->status = $status;
+        $user->save();
+
+        return response()->json([
+            'success' => true,
+            'status' => $user->status,
+            'status_label' => $user->status === 'suspended' ? 'Suspanded' : 'Active',
+            'message' => "Member status updated to " . ($user->status === 'suspended' ? 'Suspanded' : 'Active') . ".",
+        ]);
     }
 
     public function restoreMember($userId)
@@ -389,6 +487,7 @@ class TeamManagementController extends Controller
             'team_ids.*' => ['integer', 'exists:teams,id'],
             'permissions' => ['nullable', 'array'],
             'permissions.*' => ['string', 'in:' . implode(',', User::SECTIONS)],
+            'status' => ['nullable', 'string', 'in:active,suspended,suspanded'],
             'image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,svg', 'max:2048'],
             'password' => [($isCreate ? 'required' : 'nullable'), 'string', 'min:8'],
         ];

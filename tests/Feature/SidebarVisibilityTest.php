@@ -93,6 +93,32 @@ class SidebarVisibilityTest extends TestCase
         $this->assertStringContainsString('/todo', $html);
     }
 
+    public function test_super_admin_dashboard_shows_website_overview_and_account_overview(): void
+    {
+        $user = User::factory()->create(['role' => 'super_admin']);
+
+        $response = $this->actingAs($user)->get('/dashboard')->assertOk();
+
+        $html = $response->getContent();
+        $this->assertStringContainsString('Website Overview', $html);
+        $this->assertStringContainsString("Today's Join Requests", $html);
+        $this->assertStringContainsString('My Account Overview', $html);
+        $this->assertStringContainsString("Today's Emails", $html);
+    }
+
+    public function test_regular_member_dashboard_only_shows_account_overview(): void
+    {
+        $user = User::factory()->create(['role' => 'member', 'permissions' => []]);
+
+        $response = $this->actingAs($user)->get('/dashboard')->assertOk();
+
+        $html = $response->getContent();
+        $this->assertStringNotContainsString('Website Overview', $html);
+        $this->assertStringNotContainsString("Today's Join Requests", $html);
+        $this->assertStringContainsString("Total Projects", $html);
+        $this->assertStringContainsString("Today's Emails", $html);
+    }
+
     public function test_debug_dashboard_route_returns_404(): void
     {
         $user = User::factory()->create(['role' => 'super_admin']);

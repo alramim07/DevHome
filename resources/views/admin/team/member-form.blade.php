@@ -49,6 +49,16 @@
                         @enderror
                     </div>
                     <div class="mb-3">
+                        <label class="form-label">Status</label>
+                        <select name="status" class="form-select bg-dark @error('status') is-invalid @enderror">
+                            <option value="active" {{ old('status', $member?->status ?? 'active') === 'active' ? 'selected' : '' }}>Active</option>
+                            <option value="suspended" {{ in_array(old('status', $member?->status), ['suspended', 'suspanded']) ? 'selected' : '' }}>Suspanded</option>
+                        </select>
+                        @error('status')
+                        <div class="alert alert-danger">{{ $message }}</div>
+                        @enderror
+                    </div>
+                    <div class="mb-3">
                         <label class="form-label">Position <span class="text-muted small">(preset pre-fills permissions
                                 below)</span></label>
                         <select name="position_id" id="positionSelect" class="form-select bg-dark">

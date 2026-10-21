@@ -39,8 +39,9 @@
 @endpush
 <div class="container-fluid pt-4 px-4">
   <div class="bg-secondary rounded h-100 p-4">
-    <table class="table">
-      <h2 class="mb-4">Team Join Requests</h2>
+    <h2 class="mb-4">Team Join Requests</h2>
+    <div class="table-responsive">
+      <table class="table table-dark table-striped align-middle">
         <thead>
         <tr>          
           <th scope="col">No.</th>
@@ -65,8 +66,8 @@
         </tr>
         @endforeach
       </tbody>
-    </table>
+      </table>
+    </div>
   </div>
 </div>
-
 @endsection

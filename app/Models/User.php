@@ -60,6 +60,7 @@ class User extends Authenticatable
         'slug',
         'custom_cv',
         'role',
+        'status',
         'position_id',
         'permissions',
 
@@ -133,4 +134,13 @@ public function getRouteKeyName()
     return 'slug';
 }
 
+    public function isSuspended(): bool
+    {
+        return in_array(strtolower($this->status ?? 'active'), ['suspended', 'suspanded'], true);
+    }
+
+    public function isActive(): bool
+    {
+        return !$this->isSuspended();
+    }
 }

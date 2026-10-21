@@ -2,7 +2,7 @@
 @section(section: 'content')
     <div class="container">
         <div class="main-body">
-            <div class="row container-fluid pt-4 px-4">
+            <div class="row pt-4 px-2 px-md-4">
                 <div class="col-lg-4">
                     <div class="card newBack">
                         <div class="card-body">
@@ -186,7 +186,7 @@
                                         <input type="password" name="password" class="form-control">
                                     </div>
                                 </div>
-                                <div class=" row container-fluid pt-4 px-4">
+                                <div class="row pt-3">
                                     <div class="col-sm-9 text-secondary">
                                         <button type="submit" class="btn btn-primary">Update Profile</button>
                                     </div>

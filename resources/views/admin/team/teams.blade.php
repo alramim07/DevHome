@@ -24,6 +24,7 @@
         </form>
 
         {{-- Teams table --}}
+        <div class="table-responsive">
         <table class="table table-dark table-striped align-middle">
             <thead>
                 <tr>
@@ -87,6 +88,7 @@
                 @endforelse
             </tbody>
         </table>
+        </div>
 
         {{-- Rename modals (placed outside the table) --}}
         @foreach ($teams as $team)

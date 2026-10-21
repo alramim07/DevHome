@@ -8,7 +8,8 @@
                 Blog</a>
         </div>
 
-        <table class="table table-dark table-striped align-middle">
+        <div class="table-responsive">
+            <table class="table table-dark table-striped align-middle">
             <thead>
                 <tr>
                     <th>#</th>
@@ -63,6 +64,7 @@
                 @endforelse
             </tbody>
         </table>
+        </div>
     </div>
 </div>
 @endsection

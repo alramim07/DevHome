@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Todo;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Services\DashboardService;
@@ -28,14 +29,31 @@ class AdminController extends Controller
 
     public function login(Request $request)
     {
-
         $request->validate([
             'email' => 'required|email',
             'password' => 'required|min:6',
         ]);
 
+        $user = User::where('email', $request->email)->first();
+        if ($user && $user->isSuspended()) {
+            return back()->withErrors([
+                'email' => 'Your account has been suspended. Please contact the administrator.',
+            ])->withInput($request->only('email'));
+        }
+
         $credentials = $request->only('email', 'password');
-        if (Auth::attempt($credentials)) {
+        $remember = $request->boolean('remember');
+
+        if (Auth::attempt($credentials, $remember)) {
+            if (Auth::user()->isSuspended()) {
+                Auth::logout();
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
+                return back()->withErrors([
+                    'email' => 'Your account has been suspended. Please contact the administrator.',
+                ])->withInput($request->only('email'));
+            }
+
             $request->session()->regenerate();
             return redirect()->intended(route('dashboard'));
         }

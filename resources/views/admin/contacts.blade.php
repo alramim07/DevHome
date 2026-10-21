@@ -2,8 +2,8 @@
 @section('content')
 <div class="container-fluid pt-4 px-4">
   <div class="bg-secondary rounded h-100 p-4">
-    <table class="table">
-      
+    <div class="table-responsive">
+      <table class="table table-dark table-striped align-middle">
         <thead>
         <tr>
           <th scope="col">No.</th>
@@ -26,7 +26,8 @@
         </tr>
         @endforeach      
       </tbody>
-    </table>
+      </table>
+    </div>
   </div>
 </div>
 
