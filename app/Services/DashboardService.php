@@ -30,7 +30,7 @@ class DashboardService
                                 ->whereDate('viewed_at', Carbon::today())->count(),
             'todaysEmails'  => Email::where('user_id', $user->id)
                                 ->whereDate('created_at', Carbon::today())->count(),
-            'tasks'         => Todo::where('user_id', $user->id)->latest()->take(5)->get(),
+            'tasks'         => Todo::where('user_id', $user->id)->latest()->get(),
             'tasksAll'      => Todo::where('user_id', $user->id)->get(),
             'siteSettings' => Website_settings::first() ?? new Website_settings(),
             'requests' => WantToJoin::all(),

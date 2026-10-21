@@ -31,7 +31,8 @@ public function store(Request $request) {
     return response()->json([
         'id' => $todo->id,
         'task' => $todo->task,
-        'date_formatted' => \Carbon\Carbon::parse($todo->task_time)->format('d M, Y')
+        'date_formatted' => \Carbon\Carbon::parse($todo->task_time)->format('d M, Y'),
+        'timestamp' => \Carbon\Carbon::parse($todo->task_time)->timestamp,
     ]);
 }
 
