@@ -28,13 +28,21 @@
 
         <div class="w-100 ms-3">
           <div class="d-flex w-100 align-items-center justify-content-between">
-            <span class="{{ $todo->is_completed ? 'text-decoration-line-through' : '' }}">
-              {{ $todo->task }}
-              <br>
-              <small class="text-muted" style="font-size: 0.75rem;">
-                <i class="fa fa-clock me-1"></i>{{ $todo->task_time ? $todo->task_time->format('d M, h:i A') : '' }}
-              </small>
-            </span>
+            <div class="d-flex align-items-center">
+              {{-- Status circle icon only (Green = Completed, Red = Pending) --}}
+              <button type="button" class="btn btn-link p-0 me-2 toggle-dashboard-todo-status" data-id="{{ $todo->id }}"
+                      title="{{ $todo->is_completed ? 'Completed (Click to change)' : 'Pending (Click to change)' }}"
+                      style="line-height: 1; text-decoration: none;">
+                <i class="fa fa-circle {{ $todo->is_completed ? 'text-success' : 'text-danger' }} todo-status-icon" style="font-size: 9px;"></i>
+              </button>
+              <span class="task-title-text {{ $todo->is_completed ? 'text-decoration-line-through text-muted' : '' }}">
+                {{ $todo->task }}
+                <br>
+                <small class="text-muted" style="font-size: 0.75rem;">
+                  <i class="fa fa-clock me-1"></i>{{ $todo->task_time ? $todo->task_time->format('d M, h:i A') : '' }}
+                </small>
+              </span>
+            </div>
             <button class="btn btn-sm delete-todo" data-id="{{ $todo->id }}" title="Delete task">
               <i class="fa fa-times text-primary"></i>
             </button>
@@ -51,6 +59,8 @@
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script>
     $(document).ready(function () {
+      const csrfToken = '{{ csrf_token() }}';
+
       // Initialize Calendar Flatpickr for date picker
       flatpickr(".flatpickr-date", {
         dateFormat: "Y-m-d",
@@ -73,17 +83,24 @@
             $('#task_input').val('');
             $('#no-tasks-msg').remove();
 
+            // By default task is pending (Red circle icon)
             let newTask = `
               <div class="d-flex align-items-center border-bottom py-2 todo-item" id="todo-${response.id}">
                 <input class="form-check-input m-0 todo-item-checkbox" type="checkbox" value="${response.id}" title="Select task">
                 <div class="w-100 ms-3">
                   <div class="d-flex w-100 align-items-center justify-content-between">
-                    <span>
-                      ${response.task} <br>
-                      <small class="text-muted" style="font-size: 0.75rem;">
-                        <i class="fa fa-clock me-1"></i>${response.date_formatted}
-                      </small>
-                    </span>
+                    <div class="d-flex align-items-center">
+                      <button type="button" class="btn btn-link p-0 me-2 toggle-dashboard-todo-status" data-id="${response.id}"
+                              title="Pending (Click to change)" style="line-height: 1; text-decoration: none;">
+                        <i class="fa fa-circle text-danger todo-status-icon" style="font-size: 9px;"></i>
+                      </button>
+                      <span class="task-title-text">
+                        ${response.task} <br>
+                        <small class="text-muted" style="font-size: 0.75rem;">
+                          <i class="fa fa-clock me-1"></i>${response.date_formatted}
+                        </small>
+                      </span>
+                    </div>
                     <button class="btn btn-sm delete-todo" data-id="${response.id}" title="Delete task">
                       <i class="fa fa-times text-primary"></i>
                     </button>
@@ -98,13 +115,54 @@
               toast: true,
               position: 'top-end',
               icon: 'success',
-              title: 'Task added!',
+              title: 'Task added as Pending!',
               showConfirmButton: false,
               timer: 1500
             });
           },
           error: function () {
             Swal.fire('Error!', 'Could not add task.', 'error');
+          }
+        });
+      });
+
+      // Toggle Task Status on Dashboard (Clicking circle icon)
+      $(document).on('click', '.toggle-dashboard-todo-status', function (e) {
+        e.preventDefault();
+        const btn = $(this);
+        const id = btn.data('id');
+        const icon = btn.find('.todo-status-icon');
+        const taskText = btn.siblings('.task-title-text');
+
+        $.ajax({
+          url: "{{ route('todo.toggle', ':id') }}".replace(':id', id),
+          type: "POST",
+          data: {
+            _token: csrfToken
+          },
+          success: function (response) {
+            const isCompleted = response.is_completed;
+            if (isCompleted) {
+              icon.removeClass('text-danger').addClass('text-success');
+              btn.attr('title', 'Completed (Click to change)');
+              taskText.addClass('text-decoration-line-through text-muted');
+            } else {
+              icon.removeClass('text-success').addClass('text-danger');
+              btn.attr('title', 'Pending (Click to change)');
+              taskText.removeClass('text-decoration-line-through text-muted');
+            }
+
+            Swal.fire({
+              toast: true,
+              position: 'top-end',
+              icon: 'success',
+              title: response.message || 'Status updated',
+              showConfirmButton: false,
+              timer: 1200
+            });
+          },
+          error: function () {
+            Swal.fire('Error!', 'Could not toggle status.', 'error');
           }
         });
       });
@@ -150,7 +208,7 @@
               url: "{{ route('todo.bulk-delete') }}",
               type: 'POST',
               data: {
-                _token: '{{ csrf_token() }}',
+                _token: csrfToken,
                 ids: ids
               },
               success: function (response) {
@@ -165,7 +223,7 @@
                 });
                 Swal.fire('Deleted!', response.message, 'success');
               },
-              error: function (xhr) {
+              error: function () {
                 Swal.fire('Error!', 'Could not delete selected tasks.', 'error');
               }
             });
@@ -192,10 +250,10 @@
               url: "{{ route('todo.delete', ':id') }}".replace(':id', id),
               type: 'POST',
               data: {
-                _token: '{{ csrf_token() }}',
+                _token: csrfToken,
                 _method: 'DELETE'
               },
-              success: function (response) {
+              success: function () {
                 row.fadeOut(300, function () {
                   $(this).remove();
                   updateBulkDeleteState();
@@ -205,7 +263,7 @@
                 });
                 Swal.fire('Deleted!', '', 'success');
               },
-              error: function (xhr) {
+              error: function () {
                 Swal.fire('Error!', 'Check console for details', 'error');
               }
             });

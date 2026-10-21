@@ -125,6 +125,8 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/todo', [TodoController::class, 'index'])->name('todo')->middleware('section:todo');
     Route::post('/todo/store', [TodoController::class, 'store'])->name('todo.store')->middleware('section:todo');
+    Route::post('/todo/{id}/status', [TodoController::class, 'updateStatus'])->name('todo.status')->middleware('section:todo');
+    Route::post('/todo/{id}/toggle', [TodoController::class, 'toggle'])->name('todo.toggle')->middleware('section:todo');
     Route::delete('/todo/delete/{id}', [TodoController::class, 'destroy'])->name('todo.delete')->middleware('section:todo');
     Route::post('/todo/bulk-delete', [TodoController::class, 'bulkDestroy'])->name('todo.bulk-delete')->middleware('section:todo');
 

@@ -10,5 +10,16 @@ class Todo extends Model
 
     protected $casts = [
         'task_time' => 'datetime',
+        'is_completed' => 'boolean',
     ];
+
+    public function isCompleted(): bool
+    {
+        return (bool) $this->is_completed;
+    }
+
+    public function isPending(): bool
+    {
+        return ! $this->is_completed;
+    }
 }
