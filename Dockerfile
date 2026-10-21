@@ -21,13 +21,16 @@ RUN composer install --no-dev --no-scripts --no-interaction --prefer-dist --opti
 # ---- Stage 3: runtime ----
 FROM php:8.2-fpm-alpine
 
-# nginx + supervisor + php extensions (pdo_mysql, zip, etc.)
-# GD removed — not needed for serving uploaded images; keeps image smaller and avoids
-# Alpine shared-library issues at runtime (libpng16.so.16 missing after apk del).
-RUN apk add --no-cache nginx supervisor gettext \
+# nginx + supervisor + php extensions + nodejs + chromium for PDF generation
+RUN apk add --no-cache nginx supervisor gettext nodejs npm chromium \
+    nss freetype harfbuzz ca-certificates ttf-freefont font-noto \
     oniguruma-dev libzip-dev zip unzip linux-headers $PHPIZE_DEPS \
  && docker-php-ext-install -j"$(nproc)" pdo_mysql mbstring exif bcmath zip opcache \
  && apk del oniguruma-dev libzip-dev $PHPIZE_DEPS
+
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
+    PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser \
+    CHROME_PATH=/usr/bin/chromium-browser
 
 # PHP production tuning
 RUN { \
@@ -51,6 +54,8 @@ COPY . .
 COPY --from=vendor /app/vendor ./vendor
 # Built assets (Vite manifest + built css/js)
 COPY --from=assets /app/public/build ./public/build
+# Node modules for runtime Puppeteer PDF generation
+COPY --from=assets /app/node_modules ./node_modules
 
 # Storage perms + nginx template + entrypoint
 RUN mkdir -p storage/framework/{cache,sessions,views} storage/logs bootstrap/cache \

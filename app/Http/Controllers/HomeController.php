@@ -63,18 +63,26 @@ class HomeController extends Controller
             $ip = $request->ip();
             $settings = Website_settings::first();
 
-            $alreadyViewed = ProjectView::where('project_id', $projects->id)
-                ->where('ip_address', $ip)
-                ->where('created_at', '>=', Carbon::now()->subDays(30))
-                ->exists();
+            try {
+                $alreadyViewed = ProjectView::where('project_id', $projects->id)
+                    ->where('ip_address', $ip)
+                    ->where(function ($q) {
+                        $q->where('created_at', '>=', Carbon::now()->subDays(30))
+                          ->orWhere('viewed_at', '>=', Carbon::now()->subDays(30));
+                    })
+                    ->exists();
 
-            if (!$alreadyViewed) {
-                $projects->increment('views');
+                if (!$alreadyViewed) {
+                    $projects->increment('views');
 
-                ProjectView::create([
-                    'project_id' => $projects->id,
-                    'ip_address' => $ip,
-                ]);
+                    ProjectView::create([
+                        'project_id' => $projects->id,
+                        'ip_address' => $ip,
+                        'viewed_at'  => Carbon::now(),
+                    ]);
+                }
+            } catch (\Throwable $viewEx) {
+                Log::warning('Could not record project view for project ' . $projects->id . ': ' . $viewEx->getMessage());
             }
 
             $user = User::where('id', $projects->user_id)->firstOrFail();

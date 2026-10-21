@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class ProjectView extends Model
 {
-    protected $fillable = ['project_id', 'ip_address'];
+    protected $fillable = ['project_id', 'ip_address', 'viewed_at'];
 
     public function project()
     {

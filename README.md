@@ -10,7 +10,7 @@
 
 **A modern, feature-rich portfolio platform built with Laravel 12 for developers to showcase their projects, manage CVs, and build their online presence.**
 
-[🚀 Live Demo](https://github.com/lynsromero/DevHome) • [📖 Documentation](#documentation) • [🤝 Contributing](#contributing)
+[🚀 Live Website](https://devhome.onrender.com) • [📖 Documentation](#documentation) • [🤝 Contributing](#contributing)
 
 </div>
 
@@ -34,29 +34,33 @@
 
 ### 👥 Public-Facing Features
 - **🎨 Modern Portfolio Display** - Responsive showcase of developer projects with organized layouts
+- **🌓 Solar & Lunar Eclipse Theme Switcher** - Animated dark/light toggle featuring high-contrast solar corona and crescent moon eclipse transitions
 - **🔍 Advanced Project Filtering** - Filter projects by technology stack (Laravel, PHP, MERN, Themes)
-- **📱 Mobile-First Design** - Fully responsive with dark mode support
+- **📱 Mobile-First Design** - Fully responsive with seamless theme adaptation
 - **⚡ AJAX-Powered Navigation** - Dynamic loading with smooth transitions
 - **📊 Project Analytics** - Track project views with IP-based deduplication
 - **📧 Contact Form** - Professional contact system with validation
-- **👥 Team Display** - Showcase team members and their profiles
+- **📰 Published Blog Articles** - Public articles reader (`/blog/{slug}`) with suggested posts
+- **👥 Team Display** - Showcase team members and their profiles (`/team/{slug}`)
+- **🗺️ Dynamic Sitemap & Robots.txt** - Auto-generated Google-compliant `/sitemap.xml` and `/robots.txt`
 - **🔗 SEO-Friendly URLs** - Clean URLs with slugs and meta tags
-- **📄 Rich Project Content** - HTML content rendering with TinyMCE editor
+- **📄 Rich Project Content** - HTML content rendering with rich text editor
 - **👤 Developer Profile Pages** - Individual profile pages for each developer (`/team/{slug}`)
 - **📥 CV Download** - Generate and download professional CVs in PDF format
 - **📬 Project Contact Form** - Direct contact form on project pages
 - **🗂️ Organized View Structure** - Modular frontend layouts for better maintainability
 
 ### 🛡️ Admin Panel Features
-- **🔐 Secure Authentication** - Protected admin dashboard with role-based access
+- **🔐 Granular Role-Based Access Control (RBAC)** - Position presets, customizable per-section permissions, and Super Admin hierarchy
+- **👥 Team Management Suite** - Comprehensive management for Positions (`/positions`), Teams (`/teams`), and All Members (`/members`)
 - **📊 Enhanced Analytics Dashboard** - Real-time statistics with modular components
-- **📁 Project Management** - Full CRUD operations with TinyMCE rich text editor
+- **📁 Project Management** - Full CRUD operations with rich text editor
+- **📰 Blog Publishing Engine** - Create, edit, draft, and publish articles with slug handling (`/add-blog`, `/blog-list`)
 - **👤 Profile Management** - Update personal information, social links, and custom CV
 - **📸 Image Uploads** - Handle project thumbnails, profile images, and in-editor images
 - **📧 Email Tracking** - Monitor and manage contact submissions
 - **⚙️ Settings Management** - Dynamic website configuration
-- **👥 Developer Management** - Add and manage developer profiles with slugs
-- **📝 Todo System** - Task management with date/time tracking
+- **📝 Advanced To-Do System** - Single-date & date-range filtering, newest/oldest date sorting, and bulk deletion
 - **📞 Contact Management** - View and manage website contacts
 - **📄 CV Management** - Upload custom CV PDFs and generate DevHome CVs
 - **🔧 Dashboard Service** - Modular service-based architecture
@@ -354,6 +358,17 @@ server {
 
 ---
 
+### 🔑 Default Credentials
+
+After seeding the database (`php artisan db:seed`), the following administrative accounts are available:
+
+| Role | Email | Password | Access Level |
+|------|-------|----------|--------------|
+| **Super Admin** | `devhomeadmin@gmail.com` | `DevhOme@sp01` | Full system access (all sections & settings) |
+| **Member / Demo Admin** | `john.doe@example.com` | `password` | Standard administrative sections |
+
+---
+
 ## ⚙️ Configuration
 
 ### 📄 Environment Variables
@@ -642,22 +657,22 @@ git push origin feature/amazing-feature
 
 ### ✅ Completed Features
 - ✅ Portfolio display system with AJAX filtering
-- ✅ Admin panel with authentication
-- ✅ Project CRUD with TinyMCE rich text editor
+- ✅ Admin panel with authentication & Granular RBAC
+- ✅ Positions, Teams, and Members management
+- ✅ Solar & Lunar Eclipse dark/light theme switch
+- ✅ Dynamic Sitemap (`/sitemap.xml`) & `robots.txt`
+- ✅ Blog publishing engine with article views
+- ✅ Project CRUD with rich text editor
 - ✅ AJAX filtering and loading
 - ✅ Contact form system (website & project-level)
 - ✅ Analytics and view tracking
 - ✅ Dynamic settings management
-- ✅ Developer management with slugs
-- ✅ Developer profile pages
-- ✅ Team showcase section
-- ✅ Todo task management
+- ✅ Developer profile pages & team showcase
+- ✅ Advanced To-Do system (date filtering, sorting, bulk delete)
 - ✅ Modular dashboard components
 - ✅ Organized frontend layout structure
 - ✅ Service-based architecture
-- ✅ Rich HTML content rendering
-- ✅ CV upload and management
-- ✅ PDF CV generation (DevHome template & custom)
+- ✅ CV upload, management & PDF generation
 - ✅ Image upload for editor
 
 ### 🚧 In Progress

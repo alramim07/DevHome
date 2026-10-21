@@ -38,7 +38,7 @@
                         <div class="stack-label">Expert Stacks</div>
                         <ul style="list-style: none; padding: 0;">
                             @php
-                                $languages = explode(',', $user->languages);
+                                $languages = (is_array($user->languages) ? $user->languages : (is_string($user->languages) && !empty($user->languages) ? explode(',', $user->languages) : []));
                             @endphp
                             @foreach ($languages as $language)
                                 <li class="stack-item">{{ ucfirst(trim($language)) }}</li>
@@ -120,7 +120,7 @@
                                         <dt class="profile-label">Tech Stack Skills</dt>
                                         <dd class="software-list">
                                             @php
-                                                $languages = explode(',', $user->languages);
+                                                $languages = (is_array($user->languages) ? $user->languages : (is_string($user->languages) && !empty($user->languages) ? explode(',', $user->languages) : []));
                                             @endphp
                                             @foreach ($languages as $language)
                                                 <span
