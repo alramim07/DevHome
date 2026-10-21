@@ -4,7 +4,7 @@
     <div class="bg-secondary rounded p-4">
         <h2 class="mb-4">{{ $mode === 'create' ? 'Create User' : 'Edit User: ' . $member->name }}</h2>
 
-        <form action="{{ $mode === 'create' ? route('team.members.store') : route('team.members.update', $member) }}"
+        <form action="{{ $mode === 'create' ? route('team.members.store') : route('team.members.update', $member->id) }}"
             method="POST" enctype="multipart/form-data">
             @csrf
 

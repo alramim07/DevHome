@@ -65,13 +65,12 @@ class ProjectController extends Controller
         return view('admin.projects.list', $data);
     }
 
-    public function edit($slug){
-        $data = [
-            'user' => Auth::user(),
-            'project' => Projects::where('slug' , $slug)->first(),
-        ];
-       
-        return view('admin.projects.edit' , $data);
+    public function edit(DashboardService $service, $slug)
+    {
+        $data = $service->getStats(Auth::user());
+        $data['project'] = Projects::where('slug', $slug)->firstOrFail();
+
+        return view('admin.projects.edit', $data);
     }
 
     public function update(Request $request, $slug)
