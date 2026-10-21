@@ -37,47 +37,51 @@
         </form>
 
         {{-- Positions table --}}
-        <table class="table table-dark table-striped align-middle">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Name</th>
-                    <th>Permission preset</th>
-                    <th>Members</th>
-                    <th class="text-end">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse ($positions as $position)
-                <tr>
-                    <td>{{ $loop->iteration }}</td>
-                    <td>{{ $position->name }}</td>
-                    <td>
-                        @forelse ($position->permissions ?? [] as $perm)
-                        <span class="badge bg-primary me-1">{{ $sectionsLabels[$perm] ?? $perm }}</span>
-                        @empty
-                        <span class="text-muted small">None</span>
-                        @endforelse
-                    </td>
-                    <td>{{ $position->users_count }}</td>
-                    <td class="text-end">
-                        <button class="btn btn-sm btn-outline-info" data-bs-toggle="modal"
-                            data-bs-target="#editPosition{{ $position->id }}">Edit</button>
-                        <form action="{{ route('team.positions.delete', $position) }}" method="POST" class="d-inline form-delete-position"
-                            data-name="{{ $position->name }}">
-                            @csrf
-                            <button type="button" class="btn btn-sm btn-outline-danger btn-delete-position">Delete</button>
-                        </form>
-                    </td>
-                </tr>
-                @empty
-                <tr>
-                    <td colspan="5" class="text-center text-muted">No positions yet — create your first one above.
-                    </td>
-                </tr>
-                @endforelse
-            </tbody>
-        </table>
+        <div class="table-responsive">
+            <table class="table table-dark table-striped align-middle">
+                <thead>
+                    <tr>
+                        <th style="width: 50px;">#</th>
+                        <th style="width: 220px;">Name</th>
+                        <th>Permission preset</th>
+                        <th style="width: 100px;">Members</th>
+                        <th class="text-end" style="width: 150px; white-space: nowrap;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse ($positions as $position)
+                    <tr>
+                        <td>{{ $loop->iteration }}</td>
+                        <td><span class="fw-semibold">{{ $position->name }}</span></td>
+                        <td>
+                            <div class="d-flex flex-wrap gap-1" style="max-width: 450px;">
+                                @forelse ($position->permissions ?? [] as $perm)
+                                <span class="badge bg-primary">{{ $sectionsLabels[$perm] ?? $perm }}</span>
+                                @empty
+                                <span class="text-muted small">None</span>
+                                @endforelse
+                            </div>
+                        </td>
+                        <td>{{ $position->users_count }}</td>
+                        <td class="text-end text-nowrap" style="white-space: nowrap;">
+                            <button class="btn btn-sm btn-outline-info me-1" data-bs-toggle="modal"
+                                data-bs-target="#editPosition{{ $position->id }}">Edit</button>
+                            <form action="{{ route('team.positions.delete', $position) }}" method="POST" class="d-inline form-delete-position"
+                                data-name="{{ $position->name }}">
+                                @csrf
+                                <button type="button" class="btn btn-sm btn-outline-danger btn-delete-position">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="5" class="text-center text-muted">No positions yet — create your first one above.
+                        </td>
+                    </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
 
         {{-- Edit modals (placed outside the table so background and layout render correctly) --}}
         @foreach ($positions as $position)

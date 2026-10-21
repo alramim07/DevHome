@@ -59,4 +59,31 @@ public function destroy($id)
         ], 500);
     }
 }
+
+public function bulkDestroy(Request $request)
+{
+    $request->validate([
+        'ids' => ['required', 'array'],
+        'ids.*' => ['integer'],
+    ]);
+
+    try {
+        $query = Todo::whereIn('id', $request->ids);
+        if (! Auth::user()->isSuperAdmin()) {
+            $query->where('user_id', Auth::id());
+        }
+        $count = $query->delete();
+
+        return response()->json([
+            'success' => true,
+            'count' => $count,
+            'message' => "{$count} task" . ($count === 1 ? '' : 's') . " deleted successfully"
+        ], 200);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => $e->getMessage()
+        ], 500);
+    }
+}
 }
