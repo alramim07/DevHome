@@ -1,4 +1,4 @@
-<div class="sidebar pe-4 pb-3">
+<div class="sidebar pe-2 pb-3">
     <nav class="navbar bg-secondary navbar-dark">
         <a href="{{ route('dashboard') }}" class="navbar-brand mx-4 mb-3">
             <img class="text-primary" src="{{ media_url($siteSettings?->logo) ?? 'default-icon.png' }}"
