@@ -10,11 +10,23 @@
             overflow: hidden;
         }
 
-        .swiper-slide {
+        /* Fallback: if Swiper is not initialized (carousel not working), center slides via CSS */
+        .team-swiper:not(.swiper-initialized) .swiper-wrapper {
+            display: flex;
+            justify-content: center !important;
+            flex-wrap: wrap;
+        }
+
+        .team-swiper .swiper-slide {
             height: auto;
+            display: flex;
+            justify-content: center;
         }
     </style>
 @endpush
+@php
+    $teamCount = count($teams);
+@endphp
 <section id="team" class="ke eg mm mn">
     <div class="a">
         <div class="-ud-mx-4 sb wd">
@@ -70,7 +82,9 @@
                     </div>
                 @endforeach
             </div>
-            <div class="swiper-pagination" style="bottom: 0;"></div>
+            @if ($teamCount > 1)
+                <div class="swiper-pagination" style="bottom: 0;"></div>
+            @endif
         </div>
     </div>
 </section>
@@ -78,18 +92,15 @@
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            new Swiper('.team-swiper', {
+            var teamCount = {{ $teamCount }};
+            if (teamCount <= 0) return;
+
+            var swiperOptions = {
                 slidesPerView: 1,
                 spaceBetween: 20,
-                loop: true,
-                autoplay: {
-                    delay: 1300,
-                    disableOnInteraction: false,
-                },
-                pagination: {
-                    el: '.swiper-pagination',
-                    clickable: true,
-                },
+                watchOverflow: true,
+                centerInsufficientSlides: true,
+                loop: teamCount > 4,
                 breakpoints: {
                     640: {
                         slidesPerView: 2
@@ -101,7 +112,23 @@
                         slidesPerView: 4
                     },
                 },
-            });
+            };
+
+            if (teamCount > 1) {
+                swiperOptions.pagination = {
+                    el: '.swiper-pagination',
+                    clickable: true,
+                };
+            }
+
+            if (teamCount > 4) {
+                swiperOptions.autoplay = {
+                    delay: 2000,
+                    disableOnInteraction: false,
+                };
+            }
+
+            new Swiper('.team-swiper', swiperOptions);
         });
     </script>
 @endpush
