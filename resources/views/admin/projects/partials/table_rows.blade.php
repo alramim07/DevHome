@@ -1,5 +1,8 @@
 @forelse($projects as $project)
-<tr class="text-center">              
+<tr class="text-center" id="project-row-{{ $project->slug }}">              
+    <td>
+        <input class="form-check-input project-checkbox" type="checkbox" value="{{ $project->slug }}" data-title="{{ $project->title }}">
+    </td>
     <td class="text-start">
         <div class="fw-bold">{{ $project->title }}</div>
         @if(isset($isAll) && $isAll)
@@ -15,15 +18,11 @@
 
         <a href="{{ route('edit.project', $project->slug) }}" class="btn btn-sm btn-sm-square btn-outline-warning m-1" title="Edit"><i class="fa fa-edit"></i></a>
         
-        <form action="{{ route('projects.destroy', $project->slug) }}" method="POST" style="display:inline;">
-            @csrf
-            @method('DELETE')
-            <button type="submit" class="btn btn-sm btn-sm-square btn-outline-primary m-1" onclick="return confirm('Delete this project?')" title="Delete"><i class="fa fa-trash"></i></button>
-        </form>
+        <button type="button" class="btn btn-sm btn-sm-square btn-outline-danger m-1 delete-project-btn" data-slug="{{ $project->slug }}" data-title="{{ $project->title }}" title="Delete"><i class="fa fa-trash"></i></button>
     </td>
 </tr>
 @empty
-<tr>
-    <td colspan="4" class="text-center text-muted py-4">No projects found.</td>
+<tr class="no-projects-row">
+    <td colspan="5" class="text-center text-muted py-4">No projects found.</td>
 </tr>
 @endforelse

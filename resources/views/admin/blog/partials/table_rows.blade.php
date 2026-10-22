@@ -1,5 +1,8 @@
 @forelse ($blogs as $blog)
-<tr>
+<tr id="blog-row-{{ $blog->id }}">
+    <td>
+        <input class="form-check-input blog-checkbox" type="checkbox" value="{{ $blog->id }}" data-title="{{ $blog->title }}">
+    </td>
     <td>{{ $loop->iteration }}</td>
     <td>
         @if ($blog->cover_image)
@@ -24,15 +27,11 @@
     <td>{{ $blog->created_at->format('d M Y') }}</td>
     <td class="text-end">
         <a href="{{ route('blog.edit', $blog->id) }}" class="btn btn-sm btn-outline-info">Edit</a>
-        <form action="{{ route('blog.destroy', $blog->id) }}" method="POST" class="d-inline"
-            onsubmit="return confirm('Delete blog post {{ $blog->title }}?')">
-            @csrf
-            <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
-        </form>
+        <button type="button" class="btn btn-sm btn-outline-danger delete-blog-btn" data-id="{{ $blog->id }}" data-title="{{ $blog->title }}">Delete</button>
     </td>
 </tr>
 @empty
-<tr>
-    <td colspan="7" class="text-center text-muted py-4">No blog posts found.</td>
+<tr class="no-blogs-row">
+    <td colspan="8" class="text-center text-muted py-4">No blog posts found.</td>
 </tr>
 @endforelse

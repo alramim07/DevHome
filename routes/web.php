@@ -111,6 +111,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/project-list', [ProjectController::class, 'list'])->name('list.project')->middleware('section:projects');
 
     Route::post('/project-delete/{slug}', [ProjectController::class, 'destroy'])->name('projects.destroy')->middleware('section:projects');
+    Route::post('/projects/bulk-delete', [ProjectController::class, 'bulkDestroy'])->name('projects.bulk-delete')->middleware('section:projects');
 
     Route::get('/website-settings', [WebsiteSettingsController::class, 'index'])->name('website.settings')->middleware('section:website_settings');
     Route::post('/website/update', [WebsiteSettingsController::class, 'update'])->name('website.update')->middleware('section:website_settings');
@@ -173,5 +174,6 @@ Route::middleware('auth')->group(function () {
         Route::get('/edit-blog/{id}', [BlogAdminController::class, 'edit'])->name('blog.edit');
         Route::post('/edit-blog/{id}/update', [BlogAdminController::class, 'update'])->name('blog.update');
         Route::post('/blog-list/{id}/delete', [BlogAdminController::class, 'destroy'])->name('blog.destroy');
+        Route::post('/blog-list/bulk-delete', [BlogAdminController::class, 'bulkDestroy'])->name('blog.bulk-delete');
     });
 });

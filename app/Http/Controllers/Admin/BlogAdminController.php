@@ -120,6 +120,11 @@ class BlogAdminController extends Controller
     {
         $blog = Blog::findOrFail($id);
 
+        $user = Auth::user();
+        if (! $user->isSuperAdmin() && $blog->user_id !== $user->id) {
+            abort(403);
+        }
+
         if ($blog->cover_image) {
             \Illuminate\Support\Facades\Storage::disk('public')->delete(media_path($blog->cover_image));
         }
@@ -129,7 +134,47 @@ class BlogAdminController extends Controller
         // Clear sitemap cache
         Cache::forget('sitemap');
 
+        if (request()->ajax() || request()->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Blog post deleted successfully!'
+            ]);
+        }
+
         return redirect()->route('blog.list')->with('success', 'Blog post deleted successfully!');
+    }
+
+    public function bulkDestroy(Request $request)
+    {
+        $ids = $request->input('ids', []);
+        if (empty($ids)) {
+            return response()->json(['success' => false, 'message' => 'No blog posts selected.'], 422);
+        }
+
+        $user = Auth::user();
+        $query = Blog::whereIn('id', $ids);
+        if (! $user->isSuperAdmin()) {
+            $query->where('user_id', $user->id);
+        }
+        $blogs = $query->get();
+
+        foreach ($blogs as $blog) {
+            if ($blog->cover_image) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete(media_path($blog->cover_image));
+            }
+            $blog->delete();
+        }
+
+        Cache::forget('sitemap');
+
+        $count = $blogs->count();
+        $msg = "{$count} " . Str::plural('blog post', $count) . ' deleted successfully.';
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json(['success' => true, 'message' => $msg]);
+        }
+
+        return redirect()->route('blog.list')->with('success', $msg);
     }
 
     protected function validatePost(Request $request, ?Blog $blog = null): array

@@ -309,4 +309,107 @@ class SuperAdminAllProjectsAndBlogsTest extends TestCase
         $this->assertStringContainsString('MemberContact', $ajaxResponse->json('html'));
         $this->assertStringNotContainsString('SecretContact', $ajaxResponse->json('html'));
     }
+
+    public function test_single_project_ajax_delete_works(): void
+    {
+        $user = User::factory()->create([
+            'role' => 'member',
+            'permissions' => ['projects'],
+        ]);
+
+        $project = Projects::create([
+            'user_id' => $user->id,
+            'title' => 'Delete Me Project',
+            'slug' => 'delete-me-project',
+            'description' => 'Desc',
+        ]);
+
+        $response = $this->actingAs($user)->postJson(route('projects.destroy', $project->slug));
+        $response->assertOk();
+        $response->assertJson(['success' => true]);
+        $this->assertDatabaseMissing('projects', ['slug' => 'delete-me-project']);
+    }
+
+    public function test_bulk_project_ajax_delete_works(): void
+    {
+        $user = User::factory()->create([
+            'role' => 'member',
+            'permissions' => ['projects'],
+        ]);
+
+        $p1 = Projects::create([
+            'user_id' => $user->id,
+            'title' => 'Bulk Project 1',
+            'slug' => 'bulk-project-1',
+            'description' => 'Desc',
+        ]);
+
+        $p2 = Projects::create([
+            'user_id' => $user->id,
+            'title' => 'Bulk Project 2',
+            'slug' => 'bulk-project-2',
+            'description' => 'Desc',
+        ]);
+
+        $response = $this->actingAs($user)->postJson(route('projects.bulk-delete'), [
+            'slugs' => [$p1->slug, $p2->slug],
+        ]);
+        $response->assertOk();
+        $response->assertJson(['success' => true]);
+        $this->assertDatabaseMissing('projects', ['slug' => 'bulk-project-1']);
+        $this->assertDatabaseMissing('projects', ['slug' => 'bulk-project-2']);
+    }
+
+    public function test_single_blog_ajax_delete_works(): void
+    {
+        $user = User::factory()->create([
+            'role' => 'member',
+            'permissions' => ['blog'],
+        ]);
+
+        $blog = Blog::create([
+            'user_id' => $user->id,
+            'title' => 'Delete Me Blog',
+            'slug' => 'delete-me-blog',
+            'content' => 'content',
+            'status' => 'draft',
+        ]);
+
+        $response = $this->actingAs($user)->postJson(route('blog.destroy', $blog->id));
+        $response->assertOk();
+        $response->assertJson(['success' => true]);
+        $this->assertDatabaseMissing('blogs', ['id' => $blog->id]);
+    }
+
+    public function test_bulk_blog_ajax_delete_works(): void
+    {
+        $user = User::factory()->create([
+            'role' => 'member',
+            'permissions' => ['blog'],
+        ]);
+
+        $b1 = Blog::create([
+            'user_id' => $user->id,
+            'title' => 'Bulk Blog 1',
+            'slug' => 'bulk-blog-1',
+            'content' => 'content',
+            'status' => 'draft',
+        ]);
+
+        $b2 = Blog::create([
+            'user_id' => $user->id,
+            'title' => 'Bulk Blog 2',
+            'slug' => 'bulk-blog-2',
+            'content' => 'content',
+            'status' => 'draft',
+        ]);
+
+        $response = $this->actingAs($user)->postJson(route('blog.bulk-delete'), [
+            'ids' => [$b1->id, $b2->id],
+        ]);
+        $response->assertOk();
+        $response->assertJson(['success' => true]);
+        $this->assertDatabaseMissing('blogs', ['id' => $b1->id]);
+        $this->assertDatabaseMissing('blogs', ['id' => $b2->id]);
+    }
 }

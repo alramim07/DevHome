@@ -136,6 +136,12 @@ class ProjectController extends Controller
     public function destroy($slug)
     {
         $project = Projects::where('slug', $slug)->firstOrFail();
+
+        $user = Auth::user();
+        if (! $user->isSuperAdmin() && $project->user_id !== $user->id) {
+            abort(403);
+        }
+
         if ($project->thumbnail) {
             Storage::disk('public')->delete(media_path($project->thumbnail));
         }
@@ -144,6 +150,46 @@ class ProjectController extends Controller
         // Clear sitemap cache
         Cache::forget('sitemap');
         
+        if (request()->ajax() || request()->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Project removed successfully.'
+            ]);
+        }
+
         return redirect()->route('list.project')->with('success', 'Project removed successfully.');
+    }
+
+    public function bulkDestroy(Request $request)
+    {
+        $slugs = $request->input('slugs', []);
+        if (empty($slugs)) {
+            return response()->json(['success' => false, 'message' => 'No projects selected.'], 422);
+        }
+
+        $user = Auth::user();
+        $query = Projects::whereIn('slug', $slugs);
+        if (! $user->isSuperAdmin()) {
+            $query->where('user_id', $user->id);
+        }
+        $projects = $query->get();
+
+        foreach ($projects as $project) {
+            if ($project->thumbnail) {
+                Storage::disk('public')->delete(media_path($project->thumbnail));
+            }
+            $project->delete();
+        }
+
+        Cache::forget('sitemap');
+
+        $count = $projects->count();
+        $msg = "{$count} " . Str::plural('project', $count) . ' deleted successfully.';
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json(['success' => true, 'message' => $msg]);
+        }
+
+        return redirect()->route('list.project')->with('success', $msg);
     }
 }
