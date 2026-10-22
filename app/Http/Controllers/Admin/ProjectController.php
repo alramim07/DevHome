@@ -58,9 +58,32 @@ class ProjectController extends Controller
         return redirect()->route('list.project')->with('success', 'Project Updated Successfully!');
     }
 
-    public function list(DashboardService $service)
+    public function list(Request $request, DashboardService $service)
     {
-             $data   = $service->getStats(Auth::user());
+        $user = Auth::user();
+        $scope = $request->query('scope', 'my');
+
+        if ($scope === 'all' && $user->isSuperAdmin()) {
+            $projects = Projects::with('user')->latest()->get();
+        } else {
+            $projects = Projects::where('user_id', $user->id)->latest()->get();
+            $scope = 'my';
+        }
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'scope' => $scope,
+                'count' => $projects->count(),
+                'html' => view('admin.projects.partials.table_rows', [
+                    'projects' => $projects,
+                    'isAll' => $scope === 'all',
+                ])->render(),
+            ]);
+        }
+
+        $data = $service->getStats($user);
+        $data['projects'] = $projects;
+        $data['currentScope'] = $scope;
 
         return view('admin.projects.list', $data);
     }

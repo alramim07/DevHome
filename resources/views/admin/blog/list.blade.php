@@ -2,10 +2,17 @@
 @section('content')
 <div class="container-fluid pt-4 px-4">
     <div class="bg-secondary rounded h-100 p-4">
-        <div class="d-flex align-items-center justify-content-between mb-4">
-            <h6 class="mb-0">Blog List</h6>
-            <a href="{{ route('blog.create') }}" class="btn btn-primary btn-sm"><i class="fa fa-plus me-1"></i>Add
-                Blog</a>
+        <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
+            <h6 class="mb-0" id="blogs-page-title">{{ ($currentScope ?? 'my') === 'all' ? 'All Blogs (Entire Website)' : 'My Blogs' }}</h6>
+            <div class="d-flex align-items-center gap-2">
+                <a href="{{ route('blog.create') }}" class="btn btn-primary btn-sm"><i class="fa fa-plus me-1"></i>Add Blog</a>
+                @if(Auth::user()->isSuperAdmin())
+                    <button type="button" id="btn-toggle-blogs-scope" class="btn btn-outline-info btn-sm" data-scope="{{ ($currentScope ?? 'my') === 'all' ? 'my' : 'all' }}">
+                        <i class="fa {{ ($currentScope ?? 'my') === 'all' ? 'fa-user' : 'fa-globe' }} me-1"></i>
+                        <span id="btn-blogs-scope-text">{{ ($currentScope ?? 'my') === 'all' ? 'Show My Blogs' : 'See All Blogs' }}</span>
+                    </button>
+                @endif
+            </div>
         </div>
 
         <div class="table-responsive">
@@ -21,50 +28,61 @@
                     <th class="text-end">Actions</th>
                 </tr>
             </thead>
-            <tbody>
-                @forelse ($blogs as $blog)
-                <tr>
-                    <td>{{ $loop->iteration }}</td>
-                    <td>
-                        @if ($blog->cover_image)
-                        <img src="{{ media_url($blog->cover_image) }}" alt="" class="rounded" width="60" height="40"
-                            style="object-fit: cover;">
-                        @else
-                        <span class="text-muted small">—</span>
-                        @endif
-                    </td>
-                    <td>
-                        {{ $blog->title }}
-                        @if ($blog->status === 'published')
-                        <a href="{{ route('front.blog', $blog->slug) }}" target="_blank" class="ms-1 small"
-                            title="View public page"><i class="fa fa-external-link-alt"></i></a>
-                        @endif
-                    </td>
-                    <td>{{ $blog->author?->name ?? '—' }}</td>
-                    <td>
-                        <span
-                            class="badge bg-{{ $blog->status === 'published' ? 'success' : 'secondary' }}">{{ Str::ucfirst($blog->status) }}</span>
-                    </td>
-                    <td>{{ $blog->created_at->format('d M Y') }}</td>
-                    <td class="text-end">
-                        <a href="{{ route('blog.edit', $blog->id) }}" class="btn btn-sm btn-outline-info">Edit</a>
-                        <form action="{{ route('blog.destroy', $blog->id) }}" method="POST" class="d-inline"
-                            onsubmit="return confirm('Delete blog post {{ $blog->title }}?')">
-                            @csrf
-                            <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
-                        </form>
-                    </td>
-                </tr>
-                @empty
-                <tr>
-                    <td colspan="7" class="text-center text-muted">No blog posts yet —
-                        <a href="{{ route('blog.create') }}">write your first one</a>.
-                    </td>
-                </tr>
-                @endforelse
+            <tbody id="blogs-table-body">
+                @include('admin.blog.partials.table_rows', ['blogs' => $blogs, 'isAll' => ($currentScope ?? 'my') === 'all'])
             </tbody>
         </table>
         </div>
     </div>
 </div>
+
+@if(Auth::user()->isSuperAdmin())
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const btn = document.getElementById('btn-toggle-blogs-scope');
+    const tableBody = document.getElementById('blogs-table-body');
+    const pageTitle = document.getElementById('blogs-page-title');
+    if (!btn || !tableBody) return;
+
+    btn.addEventListener('click', function() {
+        const targetScope = btn.getAttribute('data-scope') || 'all';
+        btn.disabled = true;
+        btn.classList.add('opacity-75');
+
+        fetch(`{{ route('blog.list') }}?scope=${targetScope}`, {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json'
+            }
+        })
+        .then(response => {
+            if (!response.ok) throw new Error('Network error');
+            return response.json();
+        })
+        .then(data => {
+            tableBody.innerHTML = data.html;
+            if (data.scope === 'all') {
+                btn.setAttribute('data-scope', 'my');
+                btn.innerHTML = '<i class="fa fa-user me-1"></i><span id="btn-blogs-scope-text">Show My Blogs</span>';
+                if (pageTitle) pageTitle.textContent = 'All Blogs (Entire Website)';
+            } else {
+                btn.setAttribute('data-scope', 'all');
+                btn.innerHTML = '<i class="fa fa-globe me-1"></i><span id="btn-blogs-scope-text">See All Blogs</span>';
+                if (pageTitle) pageTitle.textContent = 'My Blogs';
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            alert('Failed to load blog posts. Please try again.');
+        })
+        .finally(() => {
+            btn.disabled = false;
+            btn.classList.remove('opacity-75');
+        });
+    });
+});
+</script>
+@endpush
+@endif
 @endsection

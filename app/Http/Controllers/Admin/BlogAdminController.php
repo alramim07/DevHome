@@ -45,10 +45,32 @@ class BlogAdminController extends Controller
         return redirect()->route('blog.list')->with('success', 'Blog post created successfully!');
     }
 
-    public function list(DashboardService $service)
+    public function list(Request $request, DashboardService $service)
     {
-        $data = $service->getStats(Auth::user());
-        $data['blogs'] = Blog::with('author')->latest()->get();
+        $user = Auth::user();
+        $scope = $request->query('scope', 'my');
+
+        if ($scope === 'all' && $user->isSuperAdmin()) {
+            $blogs = Blog::with('author')->latest()->get();
+        } else {
+            $blogs = Blog::where('user_id', $user->id)->with('author')->latest()->get();
+            $scope = 'my';
+        }
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'scope' => $scope,
+                'count' => $blogs->count(),
+                'html' => view('admin.blog.partials.table_rows', [
+                    'blogs' => $blogs,
+                    'isAll' => $scope === 'all',
+                ])->render(),
+            ]);
+        }
+
+        $data = $service->getStats($user);
+        $data['blogs'] = $blogs;
+        $data['currentScope'] = $scope;
 
         return view('admin.blog.list', $data);
     }

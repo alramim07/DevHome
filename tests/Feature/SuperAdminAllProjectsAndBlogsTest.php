@@ -1,0 +1,212 @@
+<?php
+
+namespace Tests\Feature;
+
+use App\Models\Blog;
+use App\Models\Projects;
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
+
+class SuperAdminAllProjectsAndBlogsTest extends TestCase
+{
+    use RefreshDatabase;
+
+    public function test_super_admin_can_view_my_and_all_projects_via_ajax(): void
+    {
+        $superAdmin = User::factory()->create([
+            'role' => 'super_admin',
+            'permissions' => ['projects'],
+        ]);
+
+        $otherUser = User::factory()->create([
+            'role' => 'member',
+            'permissions' => ['projects'],
+        ]);
+
+        $myProject = Projects::create([
+            'user_id' => $superAdmin->id,
+            'title' => 'Super Admin Project',
+            'slug' => 'super-admin-project',
+            'description' => 'Test description',
+        ]);
+
+        $otherProject = Projects::create([
+            'user_id' => $otherUser->id,
+            'title' => 'Other Member Project',
+            'slug' => 'other-member-project',
+            'description' => 'Other description',
+        ]);
+
+        // 1. Initial page load as super admin shows My Projects and the toggle button
+        $response = $this->actingAs($superAdmin)->get(route('list.project'));
+        $response->assertOk();
+        $response->assertSee('Super Admin Project');
+        $response->assertDontSee('Other Member Project');
+        $response->assertSee('btn-toggle-projects-scope');
+        $response->assertSee('See All Projects');
+
+        // 2. AJAX request with scope=all returns all projects on entire website
+        $ajaxResponse = $this->actingAs($superAdmin)->getJson(route('list.project', ['scope' => 'all']));
+        $ajaxResponse->assertOk();
+        $ajaxResponse->assertJsonStructure(['scope', 'count', 'html']);
+        $this->assertSame('all', $ajaxResponse->json('scope'));
+        $this->assertSame(2, $ajaxResponse->json('count'));
+        $this->assertStringContainsString('Super Admin Project', $ajaxResponse->json('html'));
+        $this->assertStringContainsString('Other Member Project', $ajaxResponse->json('html'));
+        $this->assertStringContainsString($otherUser->name, $ajaxResponse->json('html'));
+
+        // 3. AJAX request with scope=my switches back to my projects
+        $ajaxMy = $this->actingAs($superAdmin)->getJson(route('list.project', ['scope' => 'my']));
+        $ajaxMy->assertOk();
+        $this->assertSame('my', $ajaxMy->json('scope'));
+        $this->assertSame(1, $ajaxMy->json('count'));
+        $this->assertStringContainsString('Super Admin Project', $ajaxMy->json('html'));
+        $this->assertStringNotContainsString('Other Member Project', $ajaxMy->json('html'));
+    }
+
+    public function test_non_super_admin_cannot_see_all_projects_button_or_scope_all(): void
+    {
+        $member = User::factory()->create([
+            'role' => 'member',
+            'permissions' => ['projects'],
+        ]);
+
+        $otherUser = User::factory()->create([
+            'role' => 'member',
+            'permissions' => ['projects'],
+        ]);
+
+        Projects::create([
+            'user_id' => $member->id,
+            'title' => 'Member Own Project',
+            'slug' => 'member-own-project',
+            'description' => 'Desc',
+        ]);
+
+        Projects::create([
+            'user_id' => $otherUser->id,
+            'title' => 'Other Secret Project',
+            'slug' => 'other-secret-project',
+            'description' => 'Desc',
+        ]);
+
+        // Initial page load doesn't show See All Projects button
+        $response = $this->actingAs($member)->get(route('list.project'));
+        $response->assertOk();
+        $response->assertSee('Member Own Project');
+        $response->assertDontSee('Other Secret Project');
+        $response->assertDontSee('btn-toggle-projects-scope');
+        $response->assertDontSee('See All Projects');
+
+        // If member tries scope=all, it falls back to my scope and only their own projects
+        $ajaxResponse = $this->actingAs($member)->getJson(route('list.project', ['scope' => 'all']));
+        $ajaxResponse->assertOk();
+        $this->assertSame('my', $ajaxResponse->json('scope'));
+        $this->assertSame(1, $ajaxResponse->json('count'));
+        $this->assertStringContainsString('Member Own Project', $ajaxResponse->json('html'));
+        $this->assertStringNotContainsString('Other Secret Project', $ajaxResponse->json('html'));
+    }
+
+    public function test_super_admin_can_view_my_and_all_blogs_via_ajax(): void
+    {
+        $superAdmin = User::factory()->create([
+            'role' => 'super_admin',
+            'permissions' => ['blog'],
+        ]);
+
+        $otherUser = User::factory()->create([
+            'role' => 'member',
+            'permissions' => ['blog'],
+        ]);
+
+        Blog::create([
+            'user_id' => $superAdmin->id,
+            'title' => 'Super Admin Blog Post',
+            'slug' => 'super-admin-blog-post',
+            'content' => '<p>Super admin post</p>',
+            'status' => 'published',
+            'published_at' => now(),
+        ]);
+
+        Blog::create([
+            'user_id' => $otherUser->id,
+            'title' => 'Other Member Blog Post',
+            'slug' => 'other-member-blog-post',
+            'content' => '<p>Other member post</p>',
+            'status' => 'draft',
+        ]);
+
+        // 1. Initial page load as super admin shows My Blogs and the toggle button
+        $response = $this->actingAs($superAdmin)->get(route('blog.list'));
+        $response->assertOk();
+        $response->assertSee('Super Admin Blog Post');
+        $response->assertDontSee('Other Member Blog Post');
+        $response->assertSee('btn-toggle-blogs-scope');
+        $response->assertSee('See All Blogs');
+
+        // 2. AJAX request with scope=all returns all blogs on entire website
+        $ajaxResponse = $this->actingAs($superAdmin)->getJson(route('blog.list', ['scope' => 'all']));
+        $ajaxResponse->assertOk();
+        $ajaxResponse->assertJsonStructure(['scope', 'count', 'html']);
+        $this->assertSame('all', $ajaxResponse->json('scope'));
+        $this->assertSame(2, $ajaxResponse->json('count'));
+        $this->assertStringContainsString('Super Admin Blog Post', $ajaxResponse->json('html'));
+        $this->assertStringContainsString('Other Member Blog Post', $ajaxResponse->json('html'));
+        $this->assertStringContainsString($otherUser->name, $ajaxResponse->json('html'));
+
+        // 3. AJAX request with scope=my switches back to my blogs
+        $ajaxMy = $this->actingAs($superAdmin)->getJson(route('blog.list', ['scope' => 'my']));
+        $ajaxMy->assertOk();
+        $this->assertSame('my', $ajaxMy->json('scope'));
+        $this->assertSame(1, $ajaxMy->json('count'));
+        $this->assertStringContainsString('Super Admin Blog Post', $ajaxMy->json('html'));
+        $this->assertStringNotContainsString('Other Member Blog Post', $ajaxMy->json('html'));
+    }
+
+    public function test_non_super_admin_cannot_see_all_blogs_button_or_scope_all(): void
+    {
+        $member = User::factory()->create([
+            'role' => 'member',
+            'permissions' => ['blog'],
+        ]);
+
+        $otherUser = User::factory()->create([
+            'role' => 'member',
+            'permissions' => ['blog'],
+        ]);
+
+        Blog::create([
+            'user_id' => $member->id,
+            'title' => 'Member Own Blog Post',
+            'slug' => 'member-own-blog-post',
+            'content' => '<p>Member post</p>',
+            'status' => 'published',
+            'published_at' => now(),
+        ]);
+
+        Blog::create([
+            'user_id' => $otherUser->id,
+            'title' => 'Other Member Secret Blog',
+            'slug' => 'other-member-secret-blog',
+            'content' => '<p>Secret post</p>',
+            'status' => 'draft',
+        ]);
+
+        // Initial page load doesn't show See All Blogs button
+        $response = $this->actingAs($member)->get(route('blog.list'));
+        $response->assertOk();
+        $response->assertSee('Member Own Blog Post');
+        $response->assertDontSee('Other Member Secret Blog');
+        $response->assertDontSee('btn-toggle-blogs-scope');
+        $response->assertDontSee('See All Blogs');
+
+        // If member tries scope=all, it falls back to my scope and only their own blogs
+        $ajaxResponse = $this->actingAs($member)->getJson(route('blog.list', ['scope' => 'all']));
+        $ajaxResponse->assertOk();
+        $this->assertSame('my', $ajaxResponse->json('scope'));
+        $this->assertSame(1, $ajaxResponse->json('count'));
+        $this->assertStringContainsString('Member Own Blog Post', $ajaxResponse->json('html'));
+        $this->assertStringNotContainsString('Other Member Secret Blog', $ajaxResponse->json('html'));
+    }
+}

@@ -23,10 +23,15 @@ protected $casts = [
 ];
 
 
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
     public function dailyViews()
-{
-    return $this->hasMany(ProjectView::class, 'project_id');
-}
+    {
+        return $this->hasMany(ProjectView::class, 'project_id');
+    }
 
 
 }
