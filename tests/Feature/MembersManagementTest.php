@@ -181,6 +181,21 @@ class MembersManagementTest extends TestCase
         $this->assertSame('super_admin', $other->fresh()->role);
     }
 
+    public function test_super_admin_can_update_self(): void
+    {
+        $acting = $this->superAdmin();
+
+        $this->actingAs($acting)
+            ->post("/members/{$acting->id}/update", [
+                'name' => 'Updated Super Admin',
+                'email' => $acting->email,
+                'role' => 'super_admin',
+            ])
+            ->assertRedirect(route('team.members'));
+
+        $this->assertSame('Updated Super Admin', $acting->fresh()->name);
+    }
+
     public function test_super_admin_cannot_delete_another_super_admin(): void
     {
         $acting = $this->superAdmin();

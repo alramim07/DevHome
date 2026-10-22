@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Cache;
+use App\Models\User;
 use Tests\TestCase;
 
 class SecurityHardeningTest extends TestCase
@@ -150,5 +151,24 @@ class SecurityHardeningTest extends TestCase
         $this->get('/')->assertOk();
         $this->assertTrue(Cache::has('site.settings'));
         $this->assertTrue(Cache::has('site.team'));
+    }
+
+    public function test_home_team_members_shows_only_active_users_belonging_to_teams(): void
+    {
+        Cache::flush();
+        $team = \App\Models\Team::create(['name' => 'Frontend Developers']);
+
+        $userInTeam = User::factory()->create(['name' => 'In Team Member', 'status' => 'active']);
+        $userWithoutTeam = User::factory()->create(['name' => 'No Team Member', 'status' => 'active']);
+        $suspendedInTeam = User::factory()->create(['name' => 'Suspended In Team', 'status' => 'suspended']);
+
+        $team->users()->attach([$userInTeam->id, $suspendedInTeam->id]);
+
+        $homeService = app(\App\Services\HomeService::class);
+        $data = $homeService->getHomeData(request());
+
+        $this->assertTrue($data['teams']->contains('id', $userInTeam->id));
+        $this->assertFalse($data['teams']->contains('id', $userWithoutTeam->id));
+        $this->assertFalse($data['teams']->contains('id', $suspendedInTeam->id));
     }
 }

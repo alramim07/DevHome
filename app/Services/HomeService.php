@@ -25,7 +25,12 @@ class HomeService
     {
         return [
             'projects' => $this->projectService->getFilteredProjects($request),
-            'teams'    => Cache::remember('site.team', 600, fn () => User::where('role', '!=', 'super_admin')->get()),
+            'teams'    => Cache::remember('site.team', 600, fn () => User::has('teams')
+                ->whereNull('deleted_at')
+                ->where(function ($q) {
+                    $q->where('status', 'active')->orWhereNull('status');
+                })
+                ->get()),
             'settings' => Cache::remember('site.settings', 600, fn () => Website_settings::first() ?? new Website_settings()),
         ];
     }

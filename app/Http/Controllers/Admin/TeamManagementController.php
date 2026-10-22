@@ -373,6 +373,14 @@ class TeamManagementController extends Controller
 
         $user = User::with('teams')->findOrFail($userId);
 
+        // Mutual super-admin protection: another super admin is untouchable.
+        if ($user->isSuperAdmin() && (int) $user->id !== (int) Auth::id()) {
+            return response()->view('admin.403_redirect', [
+                'message' => 'A Super Admin cannot change another Super Admin.',
+                'url' => route('team.members'),
+            ], 403);
+        }
+
         $stats = $service->getStats(Auth::user());
         $stats['positions'] = Position::orderBy('name')->get();
         $stats['teams'] = Team::orderBy('name')->get();
@@ -394,7 +402,7 @@ class TeamManagementController extends Controller
         }
 
         // Mutual super-admin protection: another super admin is untouchable.
-        if ($user->isSuperAdmin()) {
+        if ($user->isSuperAdmin() && (int) $user->id !== (int) Auth::id()) {
             return response()->view('admin.403_redirect', [
                 'message' => 'A Super Admin cannot change another Super Admin.',
                 'url' => route('team.members'),
