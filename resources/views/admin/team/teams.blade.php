@@ -1,5 +1,33 @@
 @extends('admin.layouts.app')
 @section('content')
+<style>
+.candidate-styled-checkbox {
+    border: 2px solid #70a9d4 !important;
+    background-color: rgba(112, 169, 212, 0.12) !important;
+    width: 1.25em !important;
+    height: 1.25em !important;
+    border-radius: 4px !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease-in-out !important;
+}
+.candidate-styled-checkbox:hover {
+    border-color: #8ec3ea !important;
+    box-shadow: 0 0 6px rgba(112, 169, 212, 0.5) !important;
+}
+.candidate-styled-checkbox:checked {
+    background-color: #70a9d4 !important;
+    border-color: #70a9d4 !important;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3e%3cpath fill='none' stroke='%23191c24' stroke-linecap='round' stroke-linejoin='round' stroke-width='3.2' d='M6 10l3 3l6-6'/%3e%3c/svg%3e") !important;
+}
+.candidate-styled-checkbox:indeterminate {
+    background-color: #70a9d4 !important;
+    border-color: #70a9d4 !important;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3e%3cpath fill='none' stroke='%23191c24' stroke-linecap='round' stroke-linejoin='round' stroke-width='3.2' d='M6 10h8'/%3e%3c/svg%3e") !important;
+}
+.hover-candidate-item:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+</style>
 <div class="container-fluid pt-4 px-4">
     <div class="bg-secondary rounded p-4">
         <div class="d-flex align-items-center justify-content-between mb-4">
@@ -43,33 +71,26 @@
                         <span class="fw-semibold">{{ $team->name }}</span>
                     </td>
                     <td>
-                        @forelse ($team->users as $member)
-                        <form action="{{ route('team.teams.members.remove', [$team, $member->id]) }}" method="POST"
-                            class="d-inline"
-                            onsubmit="return confirm('Remove {{ $member->name }} from {{ $team->name }}?')">
-                            @csrf
-                            <span class="badge bg-secondary me-1 mb-1">
-                                {{ $member->name }}
-                                <button type="submit" class="btn btn-link btn-sm text-danger p-0 ms-1"
-                                    title="Remove from team">×</button>
-                            </span>
-                        </form>
-                        @empty
-                        <span class="text-muted small">No members yet</span>
-                        @endforelse
+                        <span class="fw-semibold">{{ $team->active_members_count }}</span>
+                        @if ($team->users->count() > 0)
+                        <button type="button" class="btn btn-sm btn-outline-info py-0 px-2 ms-2" style="font-size: 0.75rem;"
+                            data-bs-toggle="modal" data-bs-target="#viewTeamMembers{{ $team->id }}" title="View and manage members">
+                            View
+                        </button>
+                        @endif
                     </td>
                     <td>
-                        <form action="{{ route('team.teams.members.add', $team) }}" method="POST"
-                            class="d-flex gap-1">
-                            @csrf
-                            <select name="user_id" class="form-select form-select-sm" required>
-                                <option value="">Select member…</option>
-                                @foreach ($teamCandidates as $candidate)
-                                <option value="{{ $candidate->id }}">{{ $candidate->name }}</option>
-                                @endforeach
-                            </select>
-                            <button type="submit" class="btn btn-sm btn-outline-success">Add</button>
-                        </form>
+                        @php
+                            $teamMemberIds = $team->users->pluck('id')->toArray();
+                            $availableCount = $teamCandidates->reject(fn($c) => in_array($c->id, $teamMemberIds))->count();
+                        @endphp
+                        <button type="button" class="btn btn-sm btn-outline-success text-nowrap"
+                            data-bs-toggle="modal" data-bs-target="#addMembersModal{{ $team->id }}" title="Add members to team">
+                            <i class="fa fa-user-plus me-1"></i>Add Members
+                            @if ($availableCount > 0)
+                            <span class="badge bg-success ms-1" style="font-size: 0.7rem;">{{ $availableCount }}</span>
+                            @endif
+                        </button>
                     </td>
                     <td class="text-end">
                         <button class="btn btn-sm btn-outline-info" data-bs-toggle="modal"
@@ -113,6 +134,142 @@
                 </form>
             </div>
         </div>
+
+        {{-- View / Manage Team Members modal --}}
+        <div class="modal fade" id="viewTeamMembers{{ $team->id }}" tabindex="-1" aria-labelledby="viewTeamMembersLabel{{ $team->id }}" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content bg-secondary text-white border-0 shadow">
+                    <div class="modal-header border-bottom border-dark">
+                        <h6 class="modal-title text-white" id="viewTeamMembersLabel{{ $team->id }}">
+                            <i class="fa fa-users me-2 text-primary"></i>{{ $team->name }} — Members ({{ $team->active_members_count }} active)
+                        </h6>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        @forelse ($team->users as $member)
+                        <div class="d-flex align-items-center justify-content-between py-2 border-bottom border-dark">
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="fw-medium">{{ $member->name }}</span>
+                                @if (method_exists($member, 'isSuspended') && $member->isSuspended())
+                                    <span class="badge bg-danger" style="font-size: 0.7rem;">Suspanded</span>
+                                @else
+                                    <span class="badge bg-success" style="font-size: 0.7rem;">Active</span>
+                                @endif
+                            </div>
+                            <form action="{{ route('team.teams.members.remove', [$team, $member->id]) }}" method="POST"
+                                onsubmit="return confirm('Remove {{ $member->name }} from {{ $team->name }}?')">
+                                @csrf
+                                <button type="submit" class="btn btn-sm btn-outline-danger py-0 px-2" style="font-size: 0.75rem;" title="Remove from team">
+                                    <i class="fa fa-times me-1"></i>Remove
+                                </button>
+                            </form>
+                        </div>
+                        @empty
+                        <div class="text-center text-muted py-3 small">No members in this team yet.</div>
+                        @endforelse
+                    </div>
+                    <div class="modal-footer border-top border-dark">
+                        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {{-- Add Members Modal (with Search & Bulk Select) --}}
+        <div class="modal fade add-members-modal" id="addMembersModal{{ $team->id }}" tabindex="-1" aria-labelledby="addMembersLabel{{ $team->id }}" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <form action="{{ route('team.teams.members.add', $team) }}" method="POST" class="modal-content bg-secondary text-white border-0 shadow">
+                    @csrf
+                    <div class="modal-header border-bottom border-dark">
+                        <h6 class="modal-title text-white" id="addMembersLabel{{ $team->id }}">
+                            <i class="fa fa-user-plus me-2 text-success"></i>Add Members to {{ $team->name }}
+                        </h6>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        @php
+                            $teamCurrentIds = $team->users->pluck('id')->toArray();
+                            $availableCandidates = $teamCandidates->reject(fn($c) => in_array($c->id, $teamCurrentIds));
+                        @endphp
+
+                        @if ($availableCandidates->isEmpty())
+                            <div class="text-center text-muted py-4">
+                                <i class="fa fa-info-circle fa-2x mb-2 d-block text-secondary"></i>
+                                All active members are already in this team.
+                            </div>
+                        @else
+                            {{-- Search bar & Bulk Select Header --}}
+                            <div class="row g-2 align-items-center mb-3 pb-3 border-bottom border-dark">
+                                <div class="col-md-7">
+                                    <div class="input-group input-group-sm">
+                                        <span class="input-group-text bg-dark border-dark text-muted">
+                                            <i class="fa fa-search"></i>
+                                        </span>
+                                        <input type="text" class="form-control bg-dark text-white border-dark search-candidate-input"
+                                            placeholder="Search by name, email, or position...">
+                                    </div>
+                                </div>
+                                <div class="col-md-5 d-flex align-items-center justify-content-between justify-content-md-end gap-2">
+                                    <div class="form-check m-0 d-flex align-items-center">
+                                        <input class="form-check-input select-all-candidates candidate-styled-checkbox" type="checkbox" id="selectAllCandidates{{ $team->id }}">
+                                        <label class="form-check-label ms-2 small text-muted user-select-none" for="selectAllCandidates{{ $team->id }}" style="cursor: pointer;">
+                                            Select All (<span class="visible-candidates-count">{{ $availableCandidates->count() }}</span>)
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {{-- Scrollable Candidates List --}}
+                            <div class="candidates-container pe-1" style="max-height: 320px; overflow-y: auto;">
+                                @foreach ($availableCandidates as $candidate)
+                                <div class="d-flex align-items-center justify-content-between p-2 rounded mb-1 candidate-item hover-candidate-item"
+                                     data-name="{{ strtolower($candidate->name) }}"
+                                     data-email="{{ strtolower($candidate->email) }}"
+                                     data-position="{{ strtolower($candidate->position?->name ?? '') }}"
+                                     style="transition: background-color 0.15s ease;">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <input type="checkbox" name="user_ids[]" value="{{ $candidate->id }}"
+                                               class="form-check-input candidate-checkbox candidate-styled-checkbox m-0"
+                                               id="cand-{{ $team->id }}-{{ $candidate->id }}">
+                                        <img src="{{ $candidate->image ? media_url($candidate->image) : asset('images/default-user.png') }}"
+                                             class="rounded-circle" width="36" height="36" style="object-fit: cover;" alt="">
+                                        <div>
+                                            <label class="fw-semibold text-white mb-0 user-select-none d-block" for="cand-{{ $team->id }}-{{ $candidate->id }}" style="cursor: pointer;">
+                                                {{ $candidate->name }}
+                                            </label>
+                                            <small class="text-muted d-block" style="font-size: 0.75rem;">
+                                                {{ $candidate->email }}
+                                                @if ($candidate->position)
+                                                <span class="badge bg-dark text-info ms-1">{{ $candidate->position->name }}</span>
+                                                @endif
+                                            </small>
+                                        </div>
+                                    </div>
+                                    <span class="badge bg-success-subtle text-success border border-success" style="font-size: 0.7rem;">Active</span>
+                                </div>
+                                @endforeach
+                                <div class="no-candidate-match text-center text-muted py-4 small" style="display: none;">
+                                    No members match your search.
+                                </div>
+                            </div>
+                        @endif
+                    </div>
+                    <div class="modal-footer border-top border-dark d-flex justify-content-between">
+                        <span class="small text-muted">
+                            Selected: <strong class="text-white selected-count-display">0</strong>
+                        </span>
+                        <div class="d-flex gap-2">
+                            <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+                            @if (!$availableCandidates->isEmpty())
+                            <button type="submit" class="btn btn-primary btn-sm btn-submit-candidates" disabled>
+                                <i class="fa fa-plus me-1"></i>Add Selected (<span class="selected-count-display">0</span>)
+                            </button>
+                            @endif
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
         @endforeach
     </div>
 </div>
@@ -121,6 +278,7 @@
 @push('scripts')
 <script>
     $(document).ready(function () {
+        // Delete team confirmation
         $('.btn-delete-team').on('click', function (e) {
             e.preventDefault();
             let form = $(this).closest('form');
@@ -137,6 +295,80 @@
                     form.submit();
                 }
             });
+        });
+
+        // Search candidates filter
+        $(document).on('input', '.search-candidate-input', function () {
+            const modal = $(this).closest('.add-members-modal');
+            const query = $(this).val().toLowerCase().trim();
+            let visibleCount = 0;
+
+            modal.find('.candidate-item').each(function () {
+                const name = String($(this).data('name') || '');
+                const email = String($(this).data('email') || '');
+                const position = String($(this).data('position') || '');
+
+                if (!query || name.includes(query) || email.includes(query) || position.includes(query)) {
+                    $(this).removeClass('d-none');
+                    visibleCount++;
+                } else {
+                    $(this).addClass('d-none');
+                }
+            });
+
+            modal.find('.visible-candidates-count').text(visibleCount);
+            if (visibleCount === 0) {
+                modal.find('.no-candidate-match').show();
+            } else {
+                modal.find('.no-candidate-match').hide();
+            }
+
+            updateCandidateSelectionState(modal);
+        });
+
+        // Select All toggle for visible candidates
+        $(document).on('change', '.select-all-candidates', function () {
+            const modal = $(this).closest('.add-members-modal');
+            const isChecked = $(this).is(':checked');
+            modal.find('.candidate-item:not(.d-none) .candidate-checkbox').prop('checked', isChecked);
+            updateCandidateSelectionState(modal);
+        });
+
+        // Individual candidate checkbox toggle
+        $(document).on('change', '.candidate-checkbox', function () {
+            const modal = $(this).closest('.add-members-modal');
+            updateCandidateSelectionState(modal);
+        });
+
+        function updateCandidateSelectionState(modal) {
+            const totalVisible = modal.find('.candidate-item:not(.d-none) .candidate-checkbox').length;
+            const selectedVisible = modal.find('.candidate-item:not(.d-none) .candidate-checkbox:checked').length;
+            const totalSelected = modal.find('.candidate-checkbox:checked').length;
+
+            modal.find('.selected-count-display').text(totalSelected);
+
+            const selectAllCheckbox = modal.find('.select-all-candidates');
+            if (totalVisible > 0 && selectedVisible === totalVisible) {
+                selectAllCheckbox.prop('checked', true).prop('indeterminate', false);
+            } else if (selectedVisible > 0 && selectedVisible < totalVisible) {
+                selectAllCheckbox.prop('checked', false).prop('indeterminate', true);
+            } else {
+                selectAllCheckbox.prop('checked', false).prop('indeterminate', false);
+            }
+
+            const submitBtn = modal.find('.btn-submit-candidates');
+            submitBtn.prop('disabled', totalSelected === 0);
+        }
+
+        // Reset modal state on open
+        $('.add-members-modal').on('show.bs.modal', function () {
+            const modal = $(this);
+            modal.find('.search-candidate-input').val('');
+            modal.find('.candidate-item').removeClass('d-none');
+            modal.find('.no-candidate-match').hide();
+            modal.find('.visible-candidates-count').text(modal.find('.candidate-item').length);
+            modal.find('.candidate-checkbox, .select-all-candidates').prop('checked', false).prop('indeterminate', false);
+            updateCandidateSelectionState(modal);
         });
     });
 </script>

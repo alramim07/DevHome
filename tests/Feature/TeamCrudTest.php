@@ -108,4 +108,85 @@ class TeamCrudTest extends TestCase
             ->post(route('team.teams.members.add', $team), ['user_id' => 999999])
             ->assertSessionHasErrors('user_id');
     }
+
+    public function test_teams_page_counts_only_active_members(): void
+    {
+        $admin = User::factory()->create(['role' => 'super_admin', 'status' => 'active']);
+        $team = Team::create(['name' => 'Backend']);
+
+        $activeUser1 = User::factory()->create(['name' => 'Alice Active', 'status' => 'active']);
+        $activeUser2 = User::factory()->create(['name' => 'Bob Active', 'status' => 'active']);
+        $suspendedUser = User::factory()->create(['name' => 'Charlie Suspended', 'status' => 'suspended']);
+        $deletedUser = User::factory()->create(['name' => 'David Deleted', 'status' => 'active', 'deleted_at' => now()]);
+
+        $team->users()->attach([$activeUser1->id, $activeUser2->id, $suspendedUser->id, $deletedUser->id]);
+
+        $response = $this->actingAs($admin)->get(route('team.teams'));
+        $response->assertOk();
+
+        // The active count should be 2 (Alice and Bob), excluding Charlie (suspended) and David (deleted)
+        $teamsData = $response->viewData('teams');
+        $backendTeam = $teamsData->firstWhere('id', $team->id);
+
+        $this->assertNotNull($backendTeam);
+        $this->assertEquals(2, $backendTeam->active_members_count);
+
+        // Candidates for adding should not include suspended users
+        $candidates = $response->viewData('teamCandidates');
+        $this->assertFalse($candidates->contains('id', $suspendedUser->id));
+        $this->assertTrue($candidates->contains('id', $activeUser1->id));
+    }
+
+    public function test_positions_page_counts_only_active_members(): void
+    {
+        $admin = User::factory()->create(['role' => 'super_admin']);
+        $position = \App\Models\Position::create(['name' => 'QA Engineer', 'permissions' => []]);
+
+        User::factory()->create(['position_id' => $position->id, 'status' => 'active']);
+        User::factory()->create(['position_id' => $position->id, 'status' => 'suspended']);
+
+        $response = $this->actingAs($admin)->get(route('team.positions'));
+        $response->assertOk();
+
+        $positions = $response->viewData('positions');
+        $qaPosition = $positions->firstWhere('id', $position->id);
+
+        $this->assertNotNull($qaPosition);
+        $this->assertEquals(1, $qaPosition->users_count);
+    }
+
+    public function test_bulk_add_members_to_team(): void
+    {
+        $admin = User::factory()->create(['role' => 'super_admin']);
+        $team = Team::create(['name' => 'Mobile Dev']);
+
+        $user1 = User::factory()->create(['name' => 'User One']);
+        $user2 = User::factory()->create(['name' => 'User Two']);
+        $user3 = User::factory()->create(['name' => 'User Three']);
+
+        $res = $this->actingAs($admin)
+            ->post(route('team.teams.members.add', $team), [
+                'user_ids' => [$user1->id, $user2->id, $user3->id],
+            ]);
+
+        $res->assertRedirect();
+        $this->assertDatabaseHas('team_user', ['team_id' => $team->id, 'user_id' => $user1->id]);
+        $this->assertDatabaseHas('team_user', ['team_id' => $team->id, 'user_id' => $user2->id]);
+        $this->assertDatabaseHas('team_user', ['team_id' => $team->id, 'user_id' => $user3->id]);
+        $this->assertEquals(3, $team->fresh()->users()->count());
+    }
+
+    public function test_bulk_add_members_requires_at_least_one(): void
+    {
+        $admin = User::factory()->create(['role' => 'super_admin']);
+        $team = Team::create(['name' => 'Mobile Dev']);
+
+        $res = $this->actingAs($admin)
+            ->from(route('team.teams'))
+            ->post(route('team.teams.members.add', $team), [
+                'user_ids' => [],
+            ]);
+
+        $res->assertSessionHas('error');
+    }
 }

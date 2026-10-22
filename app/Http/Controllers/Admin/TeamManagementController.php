@@ -48,7 +48,15 @@ class TeamManagementController extends Controller
     public function positions(DashboardService $service)
     {
         $stats = $service->getStats(Auth::user());
-        $stats['positions'] = Position::withCount('users')->orderBy('name')->get();
+        $stats['positions'] = Position::withCount([
+            'users' => function ($query) {
+                $query->whereNull('users.deleted_at')
+                      ->where(function ($q) {
+                          $q->where('users.status', 'active')
+                            ->orWhereNull('users.status');
+                      });
+            }
+        ])->orderBy('name')->get();
         $stats['sectionsLabels'] = User::SECTIONS_LABELS;
 
         return view('admin.team.positions', $stats);
@@ -110,9 +118,26 @@ class TeamManagementController extends Controller
     public function teams(DashboardService $service)
     {
         $stats = $service->getStats(Auth::user());
-        $stats['teams'] = Team::with('users')->orderBy('name')->get();
-        // Candidates for the "add member" dropdown: every non-deleted user.
-        $stats['teamCandidates'] = User::orderBy('name')->get(['id', 'name', 'email']);
+        $stats['teams'] = Team::with(['users' => function ($query) {
+            $query->whereNull('users.deleted_at');
+        }])->withCount([
+            'users as active_members_count' => function ($query) {
+                $query->whereNull('users.deleted_at')
+                      ->where(function ($q) {
+                          $q->where('users.status', 'active')
+                            ->orWhereNull('users.status');
+                      });
+            }
+        ])->orderBy('name')->get();
+
+        // Candidates for the "add member" dropdown: active non-deleted users.
+        $stats['teamCandidates'] = User::with('position')
+            ->whereNull('deleted_at')
+            ->where(function ($q) {
+                $q->where('status', 'active')->orWhereNull('status');
+            })
+            ->orderBy('name')
+            ->get(['id', 'name', 'email', 'image', 'position_id']);
 
         return view('admin.team.teams', $stats);
     }
@@ -149,19 +174,42 @@ class TeamManagementController extends Controller
     public function addMember(Request $request, Team $team)
     {
         $request->validate([
-            'user_id' => ['required', 'exists:users,id'],
+            'user_ids' => ['nullable', 'array'],
+            'user_ids.*' => ['integer', 'exists:users,id'],
+            'user_id' => ['nullable', 'exists:users,id'],
         ]);
 
-        $user = User::findOrFail($request->user_id);
-
-        if ($team->users()->where('users.id', $user->id)->exists()) {
-            return redirect()->route('team.teams')->with('error', $user->name . ' is already in ' . $team->name . '.');
+        $ids = [];
+        if ($request->has('user_ids')) {
+            $ids = array_map('intval', (array) $request->input('user_ids', []));
+        } elseif ($request->filled('user_id')) {
+            $ids = [(int) $request->input('user_id')];
         }
 
-        $team->users()->attach($user->id);
+        if (empty($ids)) {
+            return redirect()->route('team.teams')->with('error', 'Please select at least one member to add.');
+        }
+
+        $existingIds = $team->users()->pluck('users.id')->map(fn ($id) => (int) $id)->all();
+        $newIds = array_values(array_diff($ids, $existingIds));
+
+        if (empty($newIds)) {
+            $singleUser = count($ids) === 1 ? User::find($ids[0]) : null;
+            $msg = $singleUser ? ($singleUser->name . ' is already in ' . $team->name . '.') : ('Selected member(s) are already in ' . $team->name . '.');
+            return redirect()->route('team.teams')->with('error', $msg);
+        }
+
+        $team->users()->attach($newIds);
         Cache::forget('site.team');
 
-        return redirect()->route('team.teams')->with('success', $user->name . ' added to ' . $team->name . '.');
+        if (count($newIds) === 1) {
+            $firstUser = User::find($newIds[0]);
+            $msg = ($firstUser?->name ?? 'Member') . ' added to ' . $team->name . '.';
+        } else {
+            $msg = count($newIds) . ' members added to ' . $team->name . ' successfully.';
+        }
+
+        return redirect()->route('team.teams')->with('success', $msg);
     }
 
     public function removeMember(Team $team, $userId)
