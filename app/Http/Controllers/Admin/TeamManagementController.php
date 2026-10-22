@@ -187,6 +187,9 @@ class TeamManagementController extends Controller
         }
 
         if (empty($ids)) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => 'Please select at least one member to add.'], 422);
+            }
             return redirect()->route('team.teams')->with('error', 'Please select at least one member to add.');
         }
 
@@ -196,27 +199,63 @@ class TeamManagementController extends Controller
         if (empty($newIds)) {
             $singleUser = count($ids) === 1 ? User::find($ids[0]) : null;
             $msg = $singleUser ? ($singleUser->name . ' is already in ' . $team->name . '.') : ('Selected member(s) are already in ' . $team->name . '.');
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => $msg], 422);
+            }
             return redirect()->route('team.teams')->with('error', $msg);
         }
 
         $team->users()->attach($newIds);
         Cache::forget('site.team');
 
+        $addedUsers = User::with('position')->whereIn('id', $newIds)->get();
+
         if (count($newIds) === 1) {
-            $firstUser = User::find($newIds[0]);
+            $firstUser = $addedUsers->first();
             $msg = ($firstUser?->name ?? 'Member') . ' added to ' . $team->name . '.';
         } else {
             $msg = count($newIds) . ' members added to ' . $team->name . ' successfully.';
         }
 
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => $msg,
+                'team_id' => $team->id,
+                'team_name' => $team->name,
+                'added_users' => $addedUsers->map(function ($u) {
+                    return [
+                        'id' => $u->id,
+                        'name' => $u->name,
+                        'email' => $u->email,
+                        'position' => $u->position?->name,
+                        'is_suspended' => $u->isSuspended(),
+                    ];
+                }),
+                'active_members_count' => $team->activeUsers()->count(),
+            ]);
+        }
+
         return redirect()->route('team.teams')->with('success', $msg);
     }
 
-    public function removeMember(Team $team, $userId)
+    public function removeMember(Request $request, Team $team, $userId)
     {
         $user = User::findOrFail($userId);
         $team->users()->detach($user->id);
         Cache::forget('site.team');
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => $user->name . ' removed from ' . $team->name . '.',
+                'team_id' => $team->id,
+                'team_name' => $team->name,
+                'user_id' => $user->id,
+                'user_name' => $user->name,
+                'active_members_count' => $team->activeUsers()->count(),
+            ]);
+        }
 
         return redirect()->route('team.teams')->with('success', $user->name . ' removed from ' . $team->name . '.');
     }

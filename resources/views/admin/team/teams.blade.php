@@ -71,13 +71,12 @@
                         <span class="fw-semibold">{{ $team->name }}</span>
                     </td>
                     <td>
-                        <span class="fw-semibold">{{ $team->active_members_count }}</span>
-                        @if ($team->users->count() > 0)
-                        <button type="button" class="btn btn-sm btn-outline-info py-0 px-2 ms-2" style="font-size: 0.75rem;"
+                        <span class="fw-semibold" id="team-active-count-{{ $team->id }}">{{ $team->active_members_count }}</span>
+                        <button type="button" class="btn btn-sm btn-outline-info py-0 px-2 ms-2" style="font-size: 0.75rem; {{ $team->users->count() === 0 ? 'display: none;' : '' }}"
+                            id="team-view-btn-{{ $team->id }}"
                             data-bs-toggle="modal" data-bs-target="#viewTeamMembers{{ $team->id }}" title="View and manage members">
                             View
                         </button>
-                        @endif
                     </td>
                     <td>
                         @php
@@ -87,9 +86,7 @@
                         <button type="button" class="btn btn-sm btn-outline-success text-nowrap"
                             data-bs-toggle="modal" data-bs-target="#addMembersModal{{ $team->id }}" title="Add members to team">
                             <i class="fa fa-user-plus me-1"></i>Add Members
-                            @if ($availableCount > 0)
-                            <span class="badge bg-success ms-1" style="font-size: 0.7rem;">{{ $availableCount }}</span>
-                            @endif
+                            <span class="badge bg-success ms-1" id="team-available-badge-{{ $team->id }}" style="font-size: 0.7rem; {{ $availableCount === 0 ? 'display: none;' : '' }}">{{ $availableCount }}</span>
                         </button>
                     </td>
                     <td class="text-end">
@@ -141,32 +138,35 @@
                 <div class="modal-content bg-secondary text-white border-0 shadow">
                     <div class="modal-header border-bottom border-dark">
                         <h6 class="modal-title text-white" id="viewTeamMembersLabel{{ $team->id }}">
-                            <i class="fa fa-users me-2 text-primary"></i>{{ $team->name }} — Members ({{ $team->active_members_count }} active)
+                            <i class="fa fa-users me-2 text-primary"></i>{{ $team->name }} — Members (<span class="modal-title-count">{{ $team->active_members_count }} active</span>)
                         </h6>
                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        @forelse ($team->users as $member)
-                        <div class="d-flex align-items-center justify-content-between py-2 border-bottom border-dark">
-                            <div class="d-flex align-items-center gap-2">
-                                <span class="fw-medium">{{ $member->name }}</span>
-                                @if (method_exists($member, 'isSuspended') && $member->isSuspended())
-                                    <span class="badge bg-danger" style="font-size: 0.7rem;">Suspanded</span>
-                                @else
-                                    <span class="badge bg-success" style="font-size: 0.7rem;">Active</span>
-                                @endif
-                            </div>
-                            <form action="{{ route('team.teams.members.remove', [$team, $member->id]) }}" method="POST"
-                                onsubmit="return confirm('Remove {{ $member->name }} from {{ $team->name }}?')">
-                                @csrf
-                                <button type="submit" class="btn btn-sm btn-outline-danger py-0 px-2" style="font-size: 0.75rem;" title="Remove from team">
+                        <div class="team-members-list">
+                            @foreach ($team->users as $member)
+                            <div class="d-flex align-items-center justify-content-between py-2 border-bottom border-dark team-member-row" id="team-member-row-{{ $team->id }}-{{ $member->id }}">
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="fw-medium">{{ $member->name }}</span>
+                                    @if (method_exists($member, 'isSuspended') && $member->isSuspended())
+                                        <span class="badge bg-danger" style="font-size: 0.7rem;">Suspanded</span>
+                                    @else
+                                        <span class="badge bg-success" style="font-size: 0.7rem;">Active</span>
+                                    @endif
+                                </div>
+                                <button type="button" class="btn btn-sm btn-outline-danger py-0 px-2 btn-remove-member"
+                                    style="font-size: 0.75rem;" title="Remove from team"
+                                    data-team-id="{{ $team->id }}" data-team-name="{{ $team->name }}"
+                                    data-user-id="{{ $member->id }}" data-user-name="{{ $member->name }}"
+                                    data-url="{{ route('team.teams.members.remove', [$team, $member->id]) }}">
                                     <i class="fa fa-times me-1"></i>Remove
                                 </button>
-                            </form>
+                            </div>
+                            @endforeach
                         </div>
-                        @empty
-                        <div class="text-center text-muted py-3 small">No members in this team yet.</div>
-                        @endforelse
+                        <div class="text-center text-muted py-3 small no-team-members-msg" style="{{ $team->users->count() === 0 ? '' : 'display: none;' }}">
+                            No members in this team yet.
+                        </div>
                     </div>
                     <div class="modal-footer border-top border-dark">
                         <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
@@ -178,7 +178,9 @@
         {{-- Add Members Modal (with Search & Bulk Select) --}}
         <div class="modal fade add-members-modal" id="addMembersModal{{ $team->id }}" tabindex="-1" aria-labelledby="addMembersLabel{{ $team->id }}" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered modal-lg">
-                <form action="{{ route('team.teams.members.add', $team) }}" method="POST" class="modal-content bg-secondary text-white border-0 shadow">
+                <form action="{{ route('team.teams.members.add', $team) }}" method="POST"
+                    class="modal-content bg-secondary text-white border-0 shadow form-add-team-members"
+                    data-team-id="{{ $team->id }}" data-team-name="{{ $team->name }}">
                     @csrf
                     <div class="modal-header border-bottom border-dark">
                         <h6 class="modal-title text-white" id="addMembersLabel{{ $team->id }}">
@@ -192,12 +194,12 @@
                             $availableCandidates = $teamCandidates->reject(fn($c) => in_array($c->id, $teamCurrentIds));
                         @endphp
 
-                        @if ($availableCandidates->isEmpty())
-                            <div class="text-center text-muted py-4">
-                                <i class="fa fa-info-circle fa-2x mb-2 d-block text-secondary"></i>
-                                All active members are already in this team.
-                            </div>
-                        @else
+                        <div class="all-added-msg text-center text-muted py-4" style="{{ $availableCandidates->isEmpty() ? '' : 'display: none;' }}">
+                            <i class="fa fa-info-circle fa-2x mb-2 d-block text-secondary"></i>
+                            All active members are already in this team.
+                        </div>
+
+                        <div class="available-candidates-section" style="{{ $availableCandidates->isEmpty() ? 'display: none;' : '' }}">
                             {{-- Search bar & Bulk Select Header --}}
                             <div class="row g-2 align-items-center mb-3 pb-3 border-bottom border-dark">
                                 <div class="col-md-7">
@@ -223,6 +225,7 @@
                             <div class="candidates-container pe-1" style="max-height: 320px; overflow-y: auto;">
                                 @foreach ($availableCandidates as $candidate)
                                 <div class="d-flex align-items-center justify-content-between p-2 rounded mb-1 candidate-item hover-candidate-item"
+                                     id="cand-row-{{ $team->id }}-{{ $candidate->id }}"
                                      data-name="{{ strtolower($candidate->name) }}"
                                      data-email="{{ strtolower($candidate->email) }}"
                                      data-position="{{ strtolower($candidate->position?->name ?? '') }}"
@@ -252,7 +255,7 @@
                                     No members match your search.
                                 </div>
                             </div>
-                        @endif
+                        </div>
                     </div>
                     <div class="modal-footer border-top border-dark d-flex justify-content-between">
                         <span class="small text-muted">
@@ -260,11 +263,9 @@
                         </span>
                         <div class="d-flex gap-2">
                             <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
-                            @if (!$availableCandidates->isEmpty())
-                            <button type="submit" class="btn btn-primary btn-sm btn-submit-candidates" disabled>
+                            <button type="submit" class="btn btn-primary btn-sm btn-submit-candidates" disabled style="{{ $availableCandidates->isEmpty() ? 'display: none;' : '' }}">
                                 <i class="fa fa-plus me-1"></i>Add Selected (<span class="selected-count-display">0</span>)
                             </button>
-                            @endif
                         </div>
                     </div>
                 </form>
@@ -278,6 +279,8 @@
 @push('scripts')
 <script>
     $(document).ready(function () {
+        const csrfToken = '{{ csrf_token() }}';
+
         // Delete team confirmation
         $('.btn-delete-team').on('click', function (e) {
             e.preventDefault();
@@ -289,6 +292,8 @@
                 text: 'Delete team ' + name + '? Members stay in the system.',
                 icon: 'warning',
                 showCancelButton: true,
+                confirmButtonColor: '#dc3545',
+                cancelButtonColor: '#6c757d',
                 confirmButtonText: 'Yes, delete it!'
             }).then((result) => {
                 if (result.isConfirmed) {
@@ -369,6 +374,172 @@
             modal.find('.visible-candidates-count').text(modal.find('.candidate-item').length);
             modal.find('.candidate-checkbox, .select-all-candidates').prop('checked', false).prop('indeterminate', false);
             updateCandidateSelectionState(modal);
+        });
+
+        // AJAX Add Members form submission without page reload
+        $(document).on('submit', '.form-add-team-members', function (e) {
+            e.preventDefault();
+            const form = $(this);
+            const modal = form.closest('.add-members-modal');
+            const teamId = form.data('team-id');
+            const submitBtn = form.find('.btn-submit-candidates');
+            const originalBtnHtml = submitBtn.html();
+            const formData = form.serialize();
+
+            submitBtn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin me-1"></i>Adding...');
+
+            $.ajax({
+                url: form.attr('action'),
+                type: 'POST',
+                data: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                success: function (response) {
+                    submitBtn.prop('disabled', false).html(originalBtnHtml);
+
+                    // Close modal safely
+                    const modalEl = modal[0];
+                    const bsModal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+                    bsModal.hide();
+
+                    // Update active count in table
+                    $('#team-active-count-' + teamId).text(response.active_members_count);
+
+                    // Ensure "View" button is visible in table
+                    $('#team-view-btn-' + teamId).show();
+
+                    // Update View modal
+                    const viewModal = $('#viewTeamMembers' + teamId);
+                    viewModal.find('.modal-title-count').text(response.active_members_count + ' active');
+                    viewModal.find('.no-team-members-msg').hide();
+
+                    // For each newly added user:
+                    if (response.added_users && response.added_users.length > 0) {
+                        response.added_users.forEach(function (user) {
+                            // 1. Remove from Add Members candidate list
+                            modal.find('#cand-row-' + teamId + '-' + user.id).remove();
+
+                            // 2. Prepend to View Members modal list if not already there
+                            if ($('#team-member-row-' + teamId + '-' + user.id).length === 0) {
+                                const removeUrl = "{{ route('team.teams.members.remove', [':teamId', ':userId']) }}"
+                                    .replace(':teamId', teamId)
+                                    .replace(':userId', user.id);
+
+                                const statusBadge = user.is_suspended 
+                                    ? '<span class="badge bg-danger" style="font-size: 0.7rem;">Suspanded</span>' 
+                                    : '<span class="badge bg-success" style="font-size: 0.7rem;">Active</span>';
+
+                                const newRow = `
+                                    <div class="d-flex align-items-center justify-content-between py-2 border-bottom border-dark team-member-row" id="team-member-row-${teamId}-${user.id}">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <span class="fw-medium">${user.name}</span>
+                                            ${statusBadge}
+                                        </div>
+                                        <button type="button" class="btn btn-sm btn-outline-danger py-0 px-2 btn-remove-member"
+                                            style="font-size: 0.75rem;" title="Remove from team"
+                                            data-team-id="${teamId}" data-team-name="${response.team_name}"
+                                            data-user-id="${user.id}" data-user-name="${user.name}"
+                                            data-url="${removeUrl}">
+                                            <i class="fa fa-times me-1"></i>Remove
+                                        </button>
+                                    </div>
+                                `;
+                                viewModal.find('.team-members-list').prepend(newRow);
+                            }
+                        });
+                    }
+
+                    // Update available count badge on Add Members button
+                    const remainingCandidates = modal.find('.candidate-item').length;
+                    const availableBadge = $('#team-available-badge-' + teamId);
+                    if (remainingCandidates > 0) {
+                        availableBadge.text(remainingCandidates).show();
+                    } else {
+                        availableBadge.hide();
+                        modal.find('.available-candidates-section').hide();
+                        modal.find('.all-added-msg').show();
+                        modal.find('.btn-submit-candidates').hide();
+                    }
+
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success!',
+                        text: response.message,
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                },
+                error: function (xhr) {
+                    submitBtn.prop('disabled', false).html(originalBtnHtml);
+                    const errorMsg = xhr.responseJSON?.message || 'Could not add members to team.';
+                    Swal.fire('Error!', errorMsg, 'error');
+                }
+            });
+        });
+
+        // AJAX Remove Member with SweetAlert2 confirmation
+        $(document).on('click', '.btn-remove-member', function (e) {
+            e.preventDefault();
+            const btn = $(this);
+            const teamId = btn.data('team-id');
+            const teamName = btn.data('team-name') || 'this team';
+            const userId = btn.data('user-id');
+            const userName = btn.data('user-name') || 'this member';
+            const removeUrl = btn.data('url');
+
+            Swal.fire({
+                title: 'Remove Member?',
+                text: `Are you sure you want to remove ${userName} from ${teamName}?`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc3545',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Yes, remove!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: removeUrl,
+                        type: 'POST',
+                        data: {
+                            _token: csrfToken
+                        },
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        success: function (response) {
+                            // Remove row from View Members modal
+                            const row = $('#team-member-row-' + teamId + '-' + userId);
+                            row.fadeOut(300, function () {
+                                $(this).remove();
+                                const viewModal = $('#viewTeamMembers' + teamId);
+                                if (viewModal.find('.team-member-row').length === 0) {
+                                    viewModal.find('.no-team-members-msg').show();
+                                    $('#team-view-btn-' + teamId).hide();
+                                }
+                            });
+
+                            // Update active count in table
+                            $('#team-active-count-' + teamId).text(response.active_members_count);
+
+                            // Update View modal title count
+                            $('#viewTeamMembers' + teamId).find('.modal-title-count').text(response.active_members_count + ' active');
+
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Removed!',
+                                text: response.message || `${userName} was removed from ${teamName}.`,
+                                timer: 2000,
+                                showConfirmButton: false
+                            });
+                        },
+                        error: function (xhr) {
+                            const errorMsg = xhr.responseJSON?.message || 'Could not remove member from team.';
+                            Swal.fire('Error!', errorMsg, 'error');
+                        }
+                    });
+                }
+            });
         });
     });
 </script>

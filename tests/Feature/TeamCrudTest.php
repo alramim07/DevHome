@@ -189,4 +189,38 @@ class TeamCrudTest extends TestCase
 
         $res->assertSessionHas('error');
     }
+
+    public function test_ajax_add_and_remove_member(): void
+    {
+        $admin = User::factory()->create(['role' => 'super_admin']);
+        $team = Team::create(['name' => 'Data Science']);
+
+        $user1 = User::factory()->create(['name' => 'Data Analyst', 'status' => 'active']);
+        $user2 = User::factory()->create(['name' => 'Data Engineer', 'status' => 'active']);
+
+        // 1. AJAX Add Members
+        $addRes = $this->actingAs($admin)
+            ->postJson(route('team.teams.members.add', $team), [
+                'user_ids' => [$user1->id, $user2->id],
+            ]);
+
+        $addRes->assertOk()->assertJson([
+            'success' => true,
+            'team_id' => $team->id,
+            'active_members_count' => 2,
+        ]);
+        $this->assertEquals(2, $team->fresh()->users()->count());
+
+        // 2. AJAX Remove Member
+        $removeRes = $this->actingAs($admin)
+            ->postJson(route('team.teams.members.remove', [$team, $user1->id]));
+
+        $removeRes->assertOk()->assertJson([
+            'success' => true,
+            'team_id' => $team->id,
+            'user_id' => $user1->id,
+            'active_members_count' => 1,
+        ]);
+        $this->assertEquals(1, $team->fresh()->users()->count());
+    }
 }
