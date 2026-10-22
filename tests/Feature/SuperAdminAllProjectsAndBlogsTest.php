@@ -209,4 +209,104 @@ class SuperAdminAllProjectsAndBlogsTest extends TestCase
         $this->assertStringContainsString('Member Own Blog Post', $ajaxResponse->json('html'));
         $this->assertStringNotContainsString('Other Member Secret Blog', $ajaxResponse->json('html'));
     }
+
+    public function test_super_admin_can_view_my_and_all_emails_via_ajax(): void
+    {
+        $superAdmin = User::factory()->create([
+            'role' => 'super_admin',
+            'permissions' => ['email_list'],
+        ]);
+
+        $otherUser = User::factory()->create([
+            'role' => 'member',
+            'permissions' => ['email_list'],
+        ]);
+
+        \App\Models\Email::create([
+            'user_id' => $superAdmin->id,
+            'first_name' => 'Alice',
+            'last_name' => 'Admin',
+            'email' => 'alice@example.com',
+            'message' => 'Hello Super Admin',
+        ]);
+
+        \App\Models\Email::create([
+            'user_id' => $otherUser->id,
+            'first_name' => 'Bob',
+            'last_name' => 'Member',
+            'email' => 'bob@example.com',
+            'message' => 'Hello Other Member',
+        ]);
+
+        // 1. Initial page load as super admin shows My Emails and the toggle button
+        $response = $this->actingAs($superAdmin)->get(route('email.list'));
+        $response->assertOk();
+        $response->assertSee('Alice');
+        $response->assertDontSee('Bob');
+        $response->assertSee('btn-toggle-emails-scope');
+        $response->assertSee('See All Emails');
+
+        // 2. AJAX request with scope=all returns all emails on entire website
+        $ajaxResponse = $this->actingAs($superAdmin)->getJson(route('email.list', ['scope' => 'all']));
+        $ajaxResponse->assertOk();
+        $ajaxResponse->assertJsonStructure(['scope', 'count', 'html']);
+        $this->assertSame('all', $ajaxResponse->json('scope'));
+        $this->assertSame(2, $ajaxResponse->json('count'));
+        $this->assertStringContainsString('Alice', $ajaxResponse->json('html'));
+        $this->assertStringContainsString('Bob', $ajaxResponse->json('html'));
+        $this->assertStringContainsString($otherUser->name, $ajaxResponse->json('html'));
+
+        // 3. AJAX request with scope=my switches back to my emails
+        $ajaxMy = $this->actingAs($superAdmin)->getJson(route('email.list', ['scope' => 'my']));
+        $ajaxMy->assertOk();
+        $this->assertSame('my', $ajaxMy->json('scope'));
+        $this->assertSame(1, $ajaxMy->json('count'));
+        $this->assertStringContainsString('Alice', $ajaxMy->json('html'));
+        $this->assertStringNotContainsString('Bob', $ajaxMy->json('html'));
+    }
+
+    public function test_non_super_admin_cannot_see_all_emails_button_or_scope_all(): void
+    {
+        $member = User::factory()->create([
+            'role' => 'member',
+            'permissions' => ['email_list'],
+        ]);
+
+        $otherUser = User::factory()->create([
+            'role' => 'member',
+            'permissions' => ['email_list'],
+        ]);
+
+        \App\Models\Email::create([
+            'user_id' => $member->id,
+            'first_name' => 'MemberContact',
+            'last_name' => 'One',
+            'email' => 'm1@example.com',
+            'message' => 'Member mail',
+        ]);
+
+        \App\Models\Email::create([
+            'user_id' => $otherUser->id,
+            'first_name' => 'SecretContact',
+            'last_name' => 'Two',
+            'email' => 's2@example.com',
+            'message' => 'Secret mail',
+        ]);
+
+        // Initial page load doesn't show See All Emails button
+        $response = $this->actingAs($member)->get(route('email.list'));
+        $response->assertOk();
+        $response->assertSee('MemberContact');
+        $response->assertDontSee('SecretContact');
+        $response->assertDontSee('btn-toggle-emails-scope');
+        $response->assertDontSee('See All Emails');
+
+        // If member tries scope=all, it falls back to my scope and only their own emails
+        $ajaxResponse = $this->actingAs($member)->getJson(route('email.list', ['scope' => 'all']));
+        $ajaxResponse->assertOk();
+        $this->assertSame('my', $ajaxResponse->json('scope'));
+        $this->assertSame(1, $ajaxResponse->json('count'));
+        $this->assertStringContainsString('MemberContact', $ajaxResponse->json('html'));
+        $this->assertStringNotContainsString('SecretContact', $ajaxResponse->json('html'));
+    }
 }

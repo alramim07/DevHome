@@ -101,8 +101,6 @@
                         @error('permissions')
                         <div class="alert alert-danger">{{ $message }}</div>
                         @enderror
-                        <p class="text-muted small mt-1">Per-user permissions are final — they don't change when the
-                            position preset changes later.</p>
                     </div>
                     <div class="mb-3">
                         <label class="form-label d-block">Teams</label>

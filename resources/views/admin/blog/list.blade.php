@@ -3,7 +3,7 @@
 <div class="container-fluid pt-4 px-4">
     <div class="bg-secondary rounded h-100 p-4">
         <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
-            <h6 class="mb-0" id="blogs-page-title">{{ ($currentScope ?? 'my') === 'all' ? 'All Blogs (Entire Website)' : 'My Blogs' }}</h6>
+            <h6 class="mb-0" id="blogs-page-title">{{ ($currentScope ?? 'my') === 'all' ? 'All Blogs' : 'My Blogs' }}</h6>
             <div class="d-flex align-items-center gap-2">
                 <a href="{{ route('blog.create') }}" class="btn btn-primary btn-sm"><i class="fa fa-plus me-1"></i>Add Blog</a>
                 @if(Auth::user()->isSuperAdmin())
@@ -65,7 +65,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (data.scope === 'all') {
                 btn.setAttribute('data-scope', 'my');
                 btn.innerHTML = '<i class="fa fa-user me-1"></i><span id="btn-blogs-scope-text">Show My Blogs</span>';
-                if (pageTitle) pageTitle.textContent = 'All Blogs (Entire Website)';
+                if (pageTitle) pageTitle.textContent = 'All Blogs';
             } else {
                 btn.setAttribute('data-scope', 'all');
                 btn.innerHTML = '<i class="fa fa-globe me-1"></i><span id="btn-blogs-scope-text">See All Blogs</span>';

@@ -5,7 +5,6 @@
       <div class="d-flex align-items-center justify-content-between mb-3">
         <h6 class="mb-0 text-white">
           <i class="fa fa-globe text-primary me-2"></i>Website Overview
-          <small class="text-muted ms-1" style="font-size: 0.75rem;">(Entire Website Total Data)</small>
         </h6>
       </div>
       <div class="row g-4">
@@ -55,7 +54,6 @@
       <div class="d-flex align-items-center justify-content-between mb-3">
         <h6 class="mb-0 text-white">
           <i class="fa fa-user text-primary me-2"></i>My Account Overview
-          <small class="text-muted ms-1" style="font-size: 0.75rem;">(Super Admin Account Data)</small>
         </h6>
       </div>
     @endif

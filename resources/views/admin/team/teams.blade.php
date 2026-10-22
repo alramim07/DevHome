@@ -32,7 +32,6 @@
     <div class="bg-secondary rounded p-4">
         <div class="d-flex align-items-center justify-content-between mb-4">
             <h5 class="mb-0">Teams</h5>
-            <span class="text-muted small">Department-style groups (e.g. Design Team, Frontend Team).</span>
         </div>
 
         {{-- Create team --}}

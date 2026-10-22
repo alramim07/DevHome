@@ -4,8 +4,6 @@
     <div class="bg-secondary rounded p-4">
         <div class="d-flex align-items-center justify-content-between mb-4">
             <h5 class="mb-0">Positions</h5>
-            <span class="text-muted small">Positions are templates: their preset pre-fills the permission
-                checkboxes when creating or editing a user.</span>
         </div>
 
         {{-- Create position --}}
