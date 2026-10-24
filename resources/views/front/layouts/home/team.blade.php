@@ -22,6 +22,52 @@
             display: flex;
             justify-content: center;
         }
+
+        .team-member-card {
+            width: 100%;
+            max-width: 12.5rem;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .team-member-img-wrap {
+            width: 100%;
+            aspect-ratio: 1952 / 2158; /* Exact aspect ratio of Al-Ramim's card photo */
+            overflow: hidden;
+            border-radius: 0.375rem;
+            background-color: #1e293b;
+        }
+
+        .team-member-img-wrap .team-member-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center top;
+            display: block;
+        }
+
+        .team-member-body {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+
+        .team-member-name {
+            min-height: 2.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 0.25rem;
+        }
+
+        .team-member-role {
+            min-height: 1.25rem;
+        }
+
+        .team-member-socials {
+            margin-top: auto;
+        }
     </style>
 @endpush
 @php
@@ -42,21 +88,21 @@
             <div class="swiper-wrapper">
                 @foreach ($teams as $member)
                     <div class="swiper-slide">
-                        <div class="la cb md">
-                            <div class="xa ke oe">
-                                <img src="{{ media_url($member->image) }}" alt="image" class="oc" />
+                        <div class="la cb md team-member-card">
+                            <div class="xa ke oe team-member-img-wrap">
+                                <img src="{{ media_url($member->image) }}" alt="image" class="oc team-member-img" />
                             </div>
-                            <div class="yg">
-                                <h4 class="zh mj ta nh">
+                            <div class="yg team-member-body">
+                                <h4 class="zh mj ta nh team-member-name">
                                     @if (!$member->slug)
                                         {{ $member->name }}
                                     @else
                                         <a href="{{ route('team', $member->slug) }}">{{ $member->name }}</a>
                                     @endif
                                 </h4>
-                                <p class="xa ih xh oh newpad">{{ $member->designation }}</p>
+                                <p class="xa ih xh oh newpad team-member-role">{{ $member->designation }}</p>
 
-                                <div class="sb xd yd d-flex align-items-center">
+                                <div class="sb xd yd d-flex align-items-center team-member-socials">
                                     @php
                                         $platforms = [
                                             'facebook' => [
