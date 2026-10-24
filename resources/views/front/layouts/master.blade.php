@@ -53,6 +53,7 @@
     @include('front.layouts.footer')
     <!-- ====== Footer Section Start -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     @stack('scripts')
     <script defer src="{{ asset('front/js/bundle.js') }}"></script>
     <script>

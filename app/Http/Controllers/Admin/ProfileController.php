@@ -53,6 +53,7 @@ class ProfileController extends Controller
             $user->slug = Str::slug($request->name) ?: 'user';
         }
         $user->designation = $request->designation;
+        $user->biography = $request->biography;
         $user->facebook_url = $request->facebook_url;
         $user->linkedin_url = $request->linkedin_url;
         $user->github_url = $request->github_url;

@@ -17,8 +17,10 @@
                     <div class="profile-stacks">
                         <div class="stack-label">Expert Stacks</div>
                         <ul style="list-style: none; padding: 0;">
-
-                            @foreach ($user->languages ?? [] as $language)
+                            @php
+                                $expertStacks = is_array($user->languages) ? $user->languages : (is_string($user->languages) && !empty($user->languages) ? explode(',', $user->languages) : []);
+                            @endphp
+                            @foreach (array_slice($expertStacks, 0, 3) as $language)
                                 <li class="stack-item">{{ ucfirst(trim($language)) }}</li>
                             @endforeach
                         </ul>
@@ -46,7 +48,7 @@
                             </div>
                             <div>
                                 <dt class="profile-label">Biography</dt>
-                                <dd class="profile-value">{{ $user->biography }}</dd>
+                                <dd class="profile-value">{{ $user->biography ?: 'No biography added yet.' }}</dd>
                             </div>
                             <div>
                                 <dt class="profile-label">Social</dt>
@@ -99,7 +101,10 @@
                             <div>
                                 <dt class="profile-label">Tech Stack Skills</dt>
                                 <dd class="software-list">
-                                    @foreach ($user->languages ?? [] as $language)
+                                    @php
+                                        $allStacks = is_array($user->languages) ? $user->languages : (is_string($user->languages) && !empty($user->languages) ? explode(',', $user->languages) : []);
+                                    @endphp
+                                    @foreach ($allStacks as $language)
                                         <span class="skill-badge profile-value">{{ ucfirst(trim($language)) }}</span>
                                     @endforeach
                                 </dd>
@@ -109,23 +114,25 @@
                                 <dd class="profile-value">{{ $user->experience }}</dd>
                             </div>
                         </dl>
-                                <ul class="sb wd xd yd">
-            <li>
-                <a href="{{ route('cv.devhome', $user->slug) }}"
-                    class="bf ja ub xd yd ve ze cg oe dg _h xi dk lg:px-ud-8 ln">
-                    DevHome CV
-                </a>
-            </li>
-            <li>
-                @if ($user->custom_cv)
-                    <a href="{{ route('cv.custom', $user->slug) }}" class="bf ja ub xd yd ve ze cg oe dg _h xi dk lg:px-ud-8 ln">
-                        Customized CV
-                    </a>
-                @else
-                    <span style="display: none"></span>
-                @endif
-            </li>
-        </ul>
+                        <ul class="sb wd xd yd">
+                            <li>
+                                <a href="javascript:void(0)"
+                                    class="bf ja ub xd yd ve ze cg oe dg _h xi dk lg:px-ud-8 ln btn-download-devhome-cv"
+                                    data-user-name="{{ $user->name }}"
+                                    data-download-url="{{ route('cv.devhome', $user->slug) }}">
+                                    DevHome CV
+                                </a>
+                            </li>
+                            <li>
+                                <a href="javascript:void(0)"
+                                    class="bf ja ub xd yd ve ze cg oe dg _h xi dk lg:px-ud-8 ln btn-download-custom-cv"
+                                    data-user-name="{{ $user->name }}"
+                                    data-has-custom-cv="{{ !empty($user->custom_cv) ? '1' : '0' }}"
+                                    data-download-url="{{ route('cv.custom', $user->slug) }}">
+                                    Customized CV
+                                </a>
+                            </li>
+                        </ul>
                     </div>
                 </div>
             </div>            
@@ -136,4 +143,79 @@
     </section>
     @include('front.layouts.home.portfolio')
     @include('front.layouts.home.project-contact')
+
+@push('scripts')
+<script>
+$(document).ready(function() {
+    function triggerDownload(url) {
+        const iframe = document.createElement('iframe');
+        iframe.style.display = 'none';
+        iframe.src = url;
+        document.body.appendChild(iframe);
+        setTimeout(function() {
+            iframe.remove();
+        }, 30000);
+    }
+
+    $('.btn-download-custom-cv').on('click', function(e) {
+        e.preventDefault();
+        const userName = $(this).data('user-name') || 'This member';
+        const hasCustomCv = $(this).data('has-custom-cv') == '1';
+        const downloadUrl = $(this).data('download-url');
+
+        if (!hasCustomCv) {
+            Swal.fire({
+                title: 'No Custom CV',
+                text: `${userName} don't have any custom cv yet!`,
+                icon: 'info',
+                confirmButtonColor: '#3056d3',
+                background: '#1e2125',
+                color: '#fff',
+            });
+            return;
+        }
+
+        Swal.fire({
+            title: 'Download Customized CV?',
+            text: `Are you sure you want to download ${userName}'s Customized CV?`,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#3056d3',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Yes, Download',
+            cancelButtonText: 'Cancel',
+            background: '#1e2125',
+            color: '#fff',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                triggerDownload(downloadUrl);
+            }
+        });
+    });
+
+    $('.btn-download-devhome-cv').on('click', function(e) {
+        e.preventDefault();
+        const userName = $(this).data('user-name') || 'This member';
+        const downloadUrl = $(this).data('download-url');
+
+        Swal.fire({
+            title: 'Download DevHome CV?',
+            text: `Are you sure you want to download ${userName}'s DevHome CV?`,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#3056d3',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Yes, Download',
+            cancelButtonText: 'Cancel',
+            background: '#1e2125',
+            color: '#fff',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                triggerDownload(downloadUrl);
+            }
+        });
+    });
+});
+</script>
+@endpush
 @endsection

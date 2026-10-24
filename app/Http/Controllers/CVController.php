@@ -68,19 +68,24 @@ class CVController extends Controller
     /**
      * 2. Download Customized CV (Stored File)
      */
-    public function downloadCustom(User $user)
+    public function downloadCustom($slug)
     {
-        $user = User::where("slug", $user->slug)->firstOrFail();
-       
-        $filePath = str_replace('storage/', '', $user->custom_cv);
+        $user = User::where('slug', $slug)->firstOrFail();
 
-        $absolutePath = storage_path('app/public/' . $filePath);
-
-        if (!file_exists($absolutePath)) {
-            return back()->with('error', 'The file was not found on the server.');
+        if (empty($user->custom_cv)) {
+            return redirect()->route('team', $slug)->with('error', "{$user->name} don't have any custom cv yet!");
         }
 
-        // Use the global response helper - this avoids the "Undefined method" warning
-        return response()->download($absolutePath, "CV-Of-{$user->name}.pdf");
+        $filePath = media_path($user->custom_cv);
+        $diskPath = storage_path('app/public/' . $filePath);
+        $pubPath = public_path(ltrim($user->custom_cv, '/'));
+
+        if (file_exists($diskPath)) {
+            return response()->download($diskPath, "CV-Of-{$user->name}.pdf");
+        } elseif (file_exists($pubPath)) {
+            return response()->download($pubPath, "CV-Of-{$user->name}.pdf");
+        }
+
+        return redirect()->route('team', $slug)->with('error', 'The file was not found on the server.');
     }
 }

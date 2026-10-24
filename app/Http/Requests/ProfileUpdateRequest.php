@@ -42,6 +42,7 @@ class ProfileUpdateRequest extends FormRequest
             'slug'          => ['nullable', 'string', 'max:255', 'alpha_dash', 'unique:users,slug,' . $this->user()->id],
             'image'         => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif'],
             'custom_cv'     => ['nullable', 'file', 'mimes:pdf', 'max:10240'],
+            'biography'     => ['nullable', 'string', 'max:1000'],
             'designation'   => ['nullable', 'string', 'max:255'],
             'facebook_url'  => ['nullable', 'url'],
             'linkedin_url'  => ['nullable', 'url'],

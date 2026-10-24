@@ -22,10 +22,31 @@
             <div class="profile-card" style="width: 1333px !important; max-width: 95% !important; padding: 32px;">
                 <div class="profile-body">
                     <div class="profile-main-content">
-                        @if ($user->image && file_exists(public_path($user->image)))
-                            <img class="profile-avatar"
-                                src="{{ 'data:image/png;base64,' . base64_encode(file_get_contents(public_path($user->image))) }}">
-                        @endif
+                        @php
+                            $avatarSrc = null;
+                            if ($user->image) {
+                                $diskPath = storage_path('app/public/' . media_path($user->image));
+                                $pubPath = public_path(ltrim($user->image, '/'));
+                                if (file_exists($diskPath)) {
+                                    $mime = @mime_content_type($diskPath) ?: 'image/jpeg';
+                                    $avatarSrc = 'data:' . $mime . ';base64,' . base64_encode(file_get_contents($diskPath));
+                                } elseif (file_exists($pubPath)) {
+                                    $mime = @mime_content_type($pubPath) ?: 'image/jpeg';
+                                    $avatarSrc = 'data:' . $mime . ';base64,' . base64_encode(file_get_contents($pubPath));
+                                } else {
+                                    $avatarSrc = media_url($user->image);
+                                }
+                            }
+                            if (!$avatarSrc) {
+                                $defaultAvatar = public_path('assets/admin/images/avatars/avatar-1.png');
+                                if (file_exists($defaultAvatar)) {
+                                    $avatarSrc = 'data:image/png;base64,' . base64_encode(file_get_contents($defaultAvatar));
+                                } else {
+                                    $avatarSrc = asset('assets/admin/images/avatars/avatar-1.png');
+                                }
+                            }
+                        @endphp
+                        <img class="profile-avatar" src="{{ $avatarSrc }}" alt="{{ $user->name }}">
 
                         <div class="profile-info">
                             <span class="badge-pro">Active</span>
@@ -40,7 +61,7 @@
                             @php
                                 $languages = (is_array($user->languages) ? $user->languages : (is_string($user->languages) && !empty($user->languages) ? explode(',', $user->languages) : []));
                             @endphp
-                            @foreach ($languages as $language)
+                            @foreach (array_slice($languages, 0, 3) as $language)
                                 <li class="stack-item">{{ ucfirst(trim($language)) }}</li>
                             @endforeach
                         </ul>
@@ -64,7 +85,7 @@
                                     </div>
                                     <div>
                                         <dt class="profile-label">Biography</dt>
-                                        <dd class="profile-value">{{ $user->biography }}</dd>
+                                        <dd class="profile-value">{{ $user->biography ?: 'No biography added yet.' }}</dd>
                                     </div>
                                     <div>
                                         <dt class="profile-label">Social</dt>

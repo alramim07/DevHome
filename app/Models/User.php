@@ -58,6 +58,7 @@ class User extends Authenticatable
         'github_url',
         'experience',
         'slug',
+        'biography',
         'custom_cv',
         'role',
         'status',

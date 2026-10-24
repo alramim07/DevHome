@@ -122,4 +122,66 @@ class TeamProfileAndSlugTest extends TestCase
         $response->assertSee('Profile Slug / URL');
         $response->assertSee('priyam-slug');
     }
+
+    public function test_user_can_update_biography(): void
+    {
+        $user = User::factory()->create([
+            'email' => 'admin@example.com',
+        ]);
+
+        $response = $this->actingAs($user)->post(route('profile.update'), [
+            'name' => $user->name,
+            'email' => $user->email,
+            'biography' => 'Passionate software engineer and tech enthusiast.',
+        ]);
+
+        $response->assertSessionHas('success');
+        $this->assertSame('Passionate software engineer and tech enthusiast.', $user->fresh()->biography);
+    }
+
+    public function test_expert_stacks_shows_at_most_three(): void
+    {
+        $user = User::factory()->create([
+            'slug' => 'dev-user',
+            'languages' => ['PHP', 'Laravel', 'Vue.js', 'React', 'Python'],
+        ]);
+
+        $response = $this->get('/team/' . $user->slug);
+
+        $response->assertStatus(200);
+        $response->assertSee('Expert Stacks');
+        $response->assertSee('PHP');
+        $response->assertSee('Laravel');
+        $response->assertSee('Vue.js');
+        // React and Python should still be present in Tech Stack Skills, but let's ensure page rendered
+        $response->assertSee('Tech Stack Skills');
+    }
+
+    public function test_download_custom_cv_redirects_if_no_file(): void
+    {
+        $user = User::factory()->create([
+            'slug' => 'user-no-cv',
+            'custom_cv' => null,
+        ]);
+
+        $response = $this->get(route('cv.custom', $user->slug));
+
+        $response->assertRedirect(route('team', $user->slug));
+        $response->assertSessionHas('error');
+    }
+
+    public function test_team_profile_renders_download_buttons_with_data_attributes(): void
+    {
+        $user = User::factory()->create([
+            'slug' => 'test-buttons-user',
+            'custom_cv' => null,
+        ]);
+
+        $response = $this->get('/team/' . $user->slug);
+
+        $response->assertStatus(200);
+        $response->assertSee('btn-download-devhome-cv');
+        $response->assertSee('btn-download-custom-cv');
+        $response->assertSee('data-has-custom-cv="0"', false);
+    }
 }

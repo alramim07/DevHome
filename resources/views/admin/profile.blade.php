@@ -151,6 +151,17 @@
                                 </div>
                                 <div class="row mb-3">
                                     <div class="col-sm-3">
+                                        <h6 class="mb-0">Biography</h6>
+                                    </div>
+                                    <div class="col-sm-9 text-secondary">
+                                        <textarea name="biography" class="form-control @error('biography') is-invalid @enderror" rows="3" placeholder="Brief professional biography...">{{ old('biography', $user->biography) }}</textarea>
+                                        @error('biography')
+                                            <div class="text-danger small mt-1">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-sm-3">
                                         <h6 class="mb-0">Facebook Url</h6>
                                     </div>
                                     <div class="col-sm-9 text-secondary">
