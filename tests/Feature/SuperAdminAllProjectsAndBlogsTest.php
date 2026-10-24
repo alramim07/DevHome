@@ -54,7 +54,7 @@ class SuperAdminAllProjectsAndBlogsTest extends TestCase
         $this->assertSame(2, $ajaxResponse->json('count'));
         $this->assertStringContainsString('Super Admin Project', $ajaxResponse->json('html'));
         $this->assertStringContainsString('Other Member Project', $ajaxResponse->json('html'));
-        $this->assertStringContainsString($otherUser->name, $ajaxResponse->json('html'));
+        $this->assertStringContainsString(e($otherUser->name), $ajaxResponse->json('html'));
 
         // 3. AJAX request with scope=my switches back to my projects
         $ajaxMy = $this->actingAs($superAdmin)->getJson(route('list.project', ['scope' => 'my']));
@@ -153,7 +153,7 @@ class SuperAdminAllProjectsAndBlogsTest extends TestCase
         $this->assertSame(2, $ajaxResponse->json('count'));
         $this->assertStringContainsString('Super Admin Blog Post', $ajaxResponse->json('html'));
         $this->assertStringContainsString('Other Member Blog Post', $ajaxResponse->json('html'));
-        $this->assertStringContainsString($otherUser->name, $ajaxResponse->json('html'));
+        $this->assertStringContainsString(e($otherUser->name), $ajaxResponse->json('html'));
 
         // 3. AJAX request with scope=my switches back to my blogs
         $ajaxMy = $this->actingAs($superAdmin)->getJson(route('blog.list', ['scope' => 'my']));
@@ -254,7 +254,7 @@ class SuperAdminAllProjectsAndBlogsTest extends TestCase
         $this->assertSame(2, $ajaxResponse->json('count'));
         $this->assertStringContainsString('Alice', $ajaxResponse->json('html'));
         $this->assertStringContainsString('Bob', $ajaxResponse->json('html'));
-        $this->assertStringContainsString($otherUser->name, $ajaxResponse->json('html'));
+        $this->assertStringContainsString(e($otherUser->name), $ajaxResponse->json('html'));
 
         // 3. AJAX request with scope=my switches back to my emails
         $ajaxMy = $this->actingAs($superAdmin)->getJson(route('email.list', ['scope' => 'my']));

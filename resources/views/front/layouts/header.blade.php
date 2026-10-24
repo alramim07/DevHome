@@ -16,21 +16,90 @@
         @endif
       </a>
 
-      <!-- Hamburger Toggle BTN -->
-      <button class="am qb" @click="navigationOpen = !navigationOpen">
-        <span class="qb k td xc fc">
-          <span class="du-block j o oc ec">
-            <span class="qb k n l ff lj te zc hc oa ti si mi" :class="{ '_c ni': !navigationOpen }"></span>
-            <span class="qb k n l ff lj te zc hc oa ti si oi" :class="{ '_c bo': !navigationOpen }"></span>
-            <span class="qb k n l ff lj te zc hc oa ti si pi" :class="{ '_c qi': !navigationOpen }"></span>
+      <div class="sb xd" style="gap: 12px;">
+        <!-- Mobile Theme Toggle BTN -->
+        <div class="header-theme-mobile">
+          <button type="button"
+                  class="celestial-toggle-btn"
+                  @click="darkMode = !darkMode"
+                  :aria-label="darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'"
+                  :title="darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'">
+            <svg class="celestial-svg"
+                 :class="{ 'is-sun': darkMode, 'is-moon': !darkMode }"
+                 width="30" height="30" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <radialGradient id="celestialSunGradMob" cx="35%" cy="35%" r="65%">
+                  <stop offset="0%" stop-color="#FFF59D" />
+                  <stop offset="40%" stop-color="#FFB300" />
+                  <stop offset="85%" stop-color="#FF8F00" />
+                  <stop offset="100%" stop-color="#E65100" />
+                </radialGradient>
+                <linearGradient id="celestialRayGradMob" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#FFE082" />
+                  <stop offset="50%" stop-color="#FFA000" />
+                  <stop offset="100%" stop-color="#FF6F00" />
+                </linearGradient>
+                <radialGradient id="celestialMoonGradMob" cx="25%" cy="30%" r="75%">
+                  <stop offset="0%" stop-color="#FFFDE7" />
+                  <stop offset="20%" stop-color="#F8FAFC" />
+                  <stop offset="50%" stop-color="#94A3B8" />
+                  <stop offset="80%" stop-color="#475569" />
+                  <stop offset="100%" stop-color="#334155" />
+                </radialGradient>
+                <mask id="celestialEclipseMaskMob" maskUnits="userSpaceOnUse">
+                  <rect x="0" y="0" width="36" height="36" fill="white" />
+                  <circle class="celestial-eclipse-disk"
+                          :style="darkMode ? 'transform: translate(25px, -25px);' : 'transform: translate(0px, 0px);'"
+                          cx="24.5" cy="11.5" r="7.8" fill="black" />
+                </mask>
+              </defs>
+              <g class="celestial-rays"
+                 :style="darkMode ? 'opacity: 1; transform: scale(1) rotate(0deg);' : 'opacity: 0; transform: scale(0.2) rotate(135deg);'"
+                 stroke="url(#celestialRayGradMob)" stroke-width="2.4" stroke-linecap="round">
+                <line x1="18" y1="2" x2="18" y2="5.5" />
+                <line x1="18" y1="30.5" x2="18" y2="34" />
+                <line x1="2" y1="18" x2="5.5" y2="18" />
+                <line x1="30.5" y1="18" x2="34" y2="18" />
+                <line x1="6.7" y1="6.7" x2="9.2" y2="9.2" />
+                <line x1="26.8" y1="26.8" x2="29.3" y2="29.3" />
+                <line x1="6.7" y1="29.3" x2="9.2" y2="26.8" />
+                <line x1="26.8" y1="9.2" x2="29.3" y2="6.7" />
+              </g>
+              <g mask="url(#celestialEclipseMaskMob)">
+                <circle class="celestial-sun-body"
+                        :style="darkMode ? 'opacity: 1;' : 'opacity: 0;'"
+                        cx="18" cy="18" r="8.5" fill="url(#celestialSunGradMob)" />
+                <circle class="celestial-moon-body"
+                        :style="darkMode ? 'opacity: 0;' : 'opacity: 1;'"
+                        cx="18" cy="18" r="8.5" fill="url(#celestialMoonGradMob)"
+                        stroke="#334155" stroke-width="0.8" />
+                <g class="celestial-craters"
+                   :style="darkMode ? 'opacity: 0; transform: scale(0.5);' : 'opacity: 1; transform: scale(1);'">
+                  <circle cx="13.5" cy="18" r="1.4" fill="#1E293B" opacity="0.5" />
+                  <circle cx="16.5" cy="22.5" r="1.1" fill="#1E293B" opacity="0.45" />
+                  <circle cx="15.2" cy="13.8" r="0.9" fill="#1E293B" opacity="0.4" />
+                </g>
+              </g>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Hamburger Toggle BTN -->
+        <button class="am qb" @click="navigationOpen = !navigationOpen">
+          <span class="qb k td xc fc">
+            <span class="du-block j o oc ec">
+              <span class="qb k n l ff lj te zc hc oa ti si mi" :class="{ '_c ni': !navigationOpen }"></span>
+              <span class="qb k n l ff lj te zc hc oa ti si oi" :class="{ '_c bo': !navigationOpen }"></span>
+              <span class="qb k n l ff lj te zc hc oa ti si pi" :class="{ '_c qi': !navigationOpen }"></span>
+            </span>
+            <span class="du-block j o oc ec rd">
+              <span class="qb ff lj te ti si ni j w n ad ec" :class="{ 'ic mi': !navigationOpen }"></span>
+              <span class="qb ff lj te ti si bo j l y oc hc" :class="{ 'ic co': !navigationOpen }"></span>
+            </span>
           </span>
-          <span class="du-block j o oc ec rd">
-            <span class="qb ff lj te ti si ni j w n ad ec" :class="{ 'ic mi': !navigationOpen }"></span>
-            <span class="qb ff lj te ti si bo j l y oc hc" :class="{ 'ic co': !navigationOpen }"></span>
-          </span>
-        </span>
-      </button>
-      <!-- Hamburger Toggle BTN -->
+        </button>
+        <!-- Hamburger Toggle BTN -->
+      </div>
     </div>
 
     <div class="oc fm/4 ic bm h tl _l xd zd" :class="{ 'f cf ij do jc mc le oe mb pf': navigationOpen }">
@@ -55,7 +124,7 @@
       </nav>
 
       <div class="sb xd be nb vl">
-        <div class="ob j ul v _" :class="navigationOpen ? '!-ud-visible' : 'f'">
+        <div class="header-theme-desktop">
           <button type="button"
                   class="celestial-toggle-btn"
                   @click="darkMode = !darkMode"
@@ -141,6 +210,26 @@
   </div>
 
   <style>
+    .header-theme-mobile {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .header-theme-desktop {
+      display: none;
+    }
+
+    @media (min-width: 1024px) {
+      .header-theme-mobile {
+        display: none !important;
+      }
+      .header-theme-desktop {
+        display: inline-flex !important;
+        align-items: center;
+      }
+    }
+
     .celestial-toggle-btn {
       background: transparent !important;
       border: none !important;
