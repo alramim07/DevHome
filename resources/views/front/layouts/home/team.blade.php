@@ -28,7 +28,7 @@
             max-width: 12.5rem;
             display: flex;
             flex-direction: column;
-            height: 100%;
+            height: auto;
         }
 
         .team-member-img-wrap {
@@ -50,11 +50,9 @@
         .team-member-body {
             display: flex;
             flex-direction: column;
-            flex-grow: 1;
         }
 
         .team-member-name {
-            min-height: 2.8rem;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -62,11 +60,20 @@
         }
 
         .team-member-role {
-            min-height: 1.25rem;
+            margin-bottom: 0.5rem;
         }
 
         .team-member-socials {
-            margin-top: auto;
+            margin-top: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .team-member-socials .social-link {
+            margin-left: 0 !important;
+            margin-right: 0 !important;
         }
     </style>
 @endpush
@@ -146,7 +153,8 @@
                 spaceBetween: 20,
                 watchOverflow: true,
                 centerInsufficientSlides: true,
-                loop: teamCount > 4,
+                rewind: true,
+                grabCursor: true,
                 breakpoints: {
                     640: {
                         slidesPerView: 2
@@ -165,12 +173,10 @@
                     el: '.swiper-pagination',
                     clickable: true,
                 };
-            }
-
-            if (teamCount > 4) {
                 swiperOptions.autoplay = {
-                    delay: 2000,
+                    delay: 2500,
                     disableOnInteraction: false,
+                    pauseOnMouseEnter: true,
                 };
             }
 

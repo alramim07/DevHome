@@ -11,6 +11,26 @@
         opacity: 1;
         transform: scale(1);
     }
+
+    @media (max-width: 767px) {
+        .productcard {
+            padding: 20px 16px !important;
+        }
+
+        .project-card-zoom .imgnte .productimg {
+            width: 100% !important;
+            height: 220px !important;
+            object-fit: cover !important;
+            border-radius: 8px !important;
+        }
+
+        .project-card-zoom .project-info-box {
+            margin-left: 0.75rem !important;
+            margin-right: 0.75rem !important;
+            margin-top: -3.5rem !important;
+            padding: 24px 16px !important;
+        }
+    }
 </style>
 
 @forelse ($projects as $project)
@@ -20,7 +40,7 @@
             <div class="ke se imgnte">
                 <img src="{{ media_url($project->thumbnail) }}" alt="portfolio" class="oc productimg" loading="lazy" decoding="async" />
             </div>
-            <div class="k ca ma -ud-mt-20 ne cf hj fg ag yg hi">
+            <div class="k ca ma -ud-mt-20 ne cf hj fg ag yg hi project-info-box">
                 <span class="yh ta qb fh nh">
                     @if (!empty($project->tech_stack) && is_array($project->tech_stack))
                         {{ \Illuminate\Support\Str::limit(implode(', ', $project->tech_stack), 30, '...') }}
