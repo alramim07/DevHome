@@ -1,11 +1,112 @@
 @extends('front.layouts.master')
+
+@push('styles')
+<style>
+    @media (max-width: 768px) {
+        .albtm {
+            padding-top: 6.5rem !important;
+        }
+        .card-container {
+            padding: 0 15px;
+            width: 100%;
+        }
+        .profile-card {
+            max-width: 100% !important;
+            padding: 1.25rem;
+        }
+        .profile-body {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 1.25rem;
+            margin-top: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+        .profile-main-content {
+            width: 100%;
+        }
+        .profile-avatar {
+            width: 5rem;
+            height: 5rem;
+        }
+        .profile-name {
+            font-size: 1.25rem;
+            line-height: 1.3;
+            word-break: break-word;
+        }
+        .profile-role {
+            font-size: 0.95rem;
+            line-height: 1.3;
+            word-break: break-word;
+        }
+        .profile-stacks {
+            width: 100%;
+            text-align: left;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 1rem;
+        }
+        .profile-stacks ul {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        .profile-stacks .stack-item {
+            display: inline-block;
+            margin-top: 0;
+            padding: 0.25rem 0.65rem;
+            border-radius: 0.375rem;
+            background: rgba(48, 86, 211, 0.15);
+            border: 1px solid rgba(48, 86, 211, 0.3);
+            color: #fff;
+            font-size: 0.8rem;
+        }
+        .profile-section {
+            padding: 24px 15px !important;
+        }
+        .profile-detail-card {
+            padding: 24px 16px !important;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .card-container {
+            padding: 0 12px;
+        }
+        .profile-card {
+            padding: 1rem;
+        }
+        .profile-avatar {
+            width: 4.25rem;
+            height: 4.25rem;
+            margin-inline-end: 0.75rem;
+        }
+        .profile-name {
+            font-size: 1.15rem;
+        }
+        .profile-role {
+            font-size: 0.85rem;
+        }
+        .profile-section {
+            padding: 16px 12px !important;
+        }
+        .profile-detail-card {
+            padding: 20px 14px !important;
+        }
+        .profile-label {
+            font-size: 17px !important;
+        }
+    }
+</style>
+@endpush
+
 @section('content')
     <section class="ke eg mm mn albtm">
         <div class="card-container">
             <div class="profile-card">
                 <div class="profile-body">
                     <div class="profile-main-content">
-                        <img class="profile-avatar" src="{{ media_url($user->image) }}" alt="Joseph McFall">
+                        <img class="profile-avatar" src="{{ media_url($user->image) ?: asset('assets/admin/images/avatars/avatar-1.png') }}" alt="{{ $user->name }}">
 
                         <div class="profile-info">
                             <span class="badge-pro">Active</span>
@@ -114,7 +215,7 @@
                                 <dd class="profile-value">{{ $user->experience }}</dd>
                             </div>
                         </dl>
-                        <ul class="sb wd xd yd">
+                        <ul class="sb wd xd yd" style="gap: 12px; margin-top: 24px;">
                             <li>
                                 <a href="javascript:void(0)"
                                     class="bf ja ub xd yd ve ze cg oe dg _h xi dk lg:px-ud-8 ln btn-download-devhome-cv"
