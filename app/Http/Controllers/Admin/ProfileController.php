@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 
 class ProfileController extends Controller
@@ -46,6 +47,11 @@ class ProfileController extends Controller
 
         $user->name = $request->name;
         $user->email = $request->email;
+        if ($request->filled('slug')) {
+            $user->slug = Str::slug($request->slug);
+        } elseif (empty($user->slug)) {
+            $user->slug = Str::slug($request->name) ?: 'user';
+        }
         $user->designation = $request->designation;
         $user->facebook_url = $request->facebook_url;
         $user->linkedin_url = $request->linkedin_url;
@@ -60,6 +66,9 @@ class ProfileController extends Controller
             $user->password = Hash::make($request->password);
         }
 
+        $user->save();
+        Cache::forget('site.team');
+
         if ($request->ajax()) {
             return response()->json([
                 'status' => 'success',
@@ -67,8 +76,6 @@ class ProfileController extends Controller
                 'user' => $user
             ]);
         }
-        $user->save();
-        Cache::forget('site.team');
 
         return redirect()->back()->with('success', 'Profile updated!');
     }

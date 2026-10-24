@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class ProfileUpdateRequest extends FormRequest
 {
@@ -16,6 +17,19 @@ class ProfileUpdateRequest extends FormRequest
     }
 
     /**
+     * Prepare the data for validation.
+     */
+    protected function prepareForValidation(): void
+    {
+        if ($this->has('slug') && filled($this->slug)) {
+            $slug = Str::slug($this->slug);
+            $this->merge([
+                'slug' => $slug !== '' ? $slug : null,
+            ]);
+        }
+    }
+
+    /**
      * Get the validation rules that apply to the request.
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
@@ -25,6 +39,7 @@ class ProfileUpdateRequest extends FormRequest
         return [
             'name'          => ['required', 'string', 'max:255'],
             'email'         => ['required', 'email', 'max:255', 'unique:users,email,' . $this->user()->id],
+            'slug'          => ['nullable', 'string', 'max:255', 'alpha_dash', 'unique:users,slug,' . $this->user()->id],
             'image'         => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif'],
             'custom_cv'     => ['nullable', 'file', 'mimes:pdf', 'max:10240'],
             'designation'   => ['nullable', 'string', 'max:255'],

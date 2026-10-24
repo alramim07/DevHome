@@ -15,8 +15,8 @@ class TeamController extends Controller
     {
         $user = User::where('slug', $slug)->firstOrFail();
         
-        // Hide super admin from public team pages
-        if ($user->role === 'super_admin') {
+        // Hide super admin from public team pages unless they belong to at least one team
+        if ($user->role === 'super_admin' && ! $user->teams()->exists()) {
             abort(404, 'Team member not found');
         }
         

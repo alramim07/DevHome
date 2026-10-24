@@ -110,6 +110,22 @@
                                 </div>
                                 <div class="row mb-3">
                                     <div class="col-sm-3">
+                                        <h6 class="mb-0">Profile Slug / URL</h6>
+                                    </div>
+                                    <div class="col-sm-9 text-secondary">
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-dark text-muted border-secondary">{{ url('/team') }}/</span>
+                                            <input type="text" name="slug" class="form-control @error('slug') is-invalid @enderror"
+                                                value="{{ old('slug', $user->slug) }}" placeholder="e.g. {{ Str::slug($user->name) }}">
+                                        </div>
+                                        @error('slug')
+                                            <div class="text-danger small mt-1">{{ $message }}</div>
+                                        @enderror
+                                        <small class="text-muted d-block mt-1">Public URL: <code>{{ url('/team') }}/{{ $user->slug ?? Str::slug($user->name) }}</code></small>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-sm-3">
                                         <h6 class="mb-0">Image</h6>
                                     </div>
                                     <div class="col-sm-9 text-secondary">
