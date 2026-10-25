@@ -80,4 +80,36 @@ class ProfileController extends Controller
 
         return redirect()->back()->with('success', 'Profile updated!');
     }
+
+    public function updateCv(\Illuminate\Http\Request $request)
+    {
+        $request->validate([
+            'custom_cv' => ['required', 'file', 'mimes:pdf', 'max:10240'],
+        ]);
+
+        $user = $request->user();
+
+        if ($user->custom_cv) {
+            Storage::disk('public')->delete(media_path($user->custom_cv));
+        }
+
+        $cv = $request->file('custom_cv');
+        $cvFilename = $cv->hashName();
+        $cv->storeAs('dev_cvs', $cvFilename, 'public');
+        $user->custom_cv = 'storage/dev_cvs/' . $cvFilename;
+        $user->save();
+
+        Cache::forget('site.team');
+
+        if ($request->ajax()) {
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Custom CV updated successfully!',
+                'custom_cv' => $user->custom_cv,
+                'filename' => basename($user->custom_cv),
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'Custom CV updated successfully!');
+    }
 }

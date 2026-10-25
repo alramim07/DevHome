@@ -100,6 +100,8 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/profile-update', [ProfileController::class, 'update'])->name('profile.update');
 
+    Route::post('/profile/cv', [ProfileController::class, 'updateCv'])->name('profile.cv.update');
+
     Route::get('/add-project', [ProjectController::class, 'index'])->name('add.project')->middleware('section:projects');
 
     Route::post('/store-project', [ProjectController::class, 'store'])->name('store.project')->middleware('section:projects');

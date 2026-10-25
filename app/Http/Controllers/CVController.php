@@ -73,17 +73,68 @@ class CVController extends Controller
         $user = User::where('slug', $slug)->firstOrFail();
 
         if (empty($user->custom_cv)) {
+            if (request()->ajax() || request()->wantsJson()) {
+                return response()->json(['error' => "{$user->name} don't have any custom cv yet!"], 404);
+            }
             return redirect()->route('team', $slug)->with('error', "{$user->name} don't have any custom cv yet!");
         }
 
-        $filePath = media_path($user->custom_cv);
-        $diskPath = storage_path('app/public/' . $filePath);
-        $pubPath = public_path(ltrim($user->custom_cv, '/'));
+        $downloadName = "CV-Of-" . \Illuminate\Support\Str::slug($user->name) . ".pdf";
 
+        // 1. If stored as an absolute URL (e.g. Supabase bucket)
+        if (\Illuminate\Support\Str::startsWith($user->custom_cv, ['http://', 'https://'])) {
+            try {
+                $fileContent = @file_get_contents($user->custom_cv);
+                if ($fileContent !== false) {
+                    return response($fileContent, 200, [
+                        'Content-Type' => 'application/pdf',
+                        'Content-Disposition' => 'attachment; filename="' . $downloadName . '"',
+                        'Content-Length' => strlen($fileContent),
+                    ]);
+                }
+            } catch (\Throwable $e) {
+                \Log::warning('Remote CV stream failed: ' . $e->getMessage());
+            }
+            return redirect()->away($user->custom_cv);
+        }
+
+        $filePath = media_path($user->custom_cv);
+
+        // 2. Storage facade (works for both local disk and S3/Supabase storage on Render)
+        if (\Illuminate\Support\Facades\Storage::disk('public')->exists($filePath)) {
+            return \Illuminate\Support\Facades\Storage::disk('public')->download($filePath, $downloadName);
+        }
+
+        // 3. Fallback: local storage directory
+        $diskPath = storage_path('app/public/' . $filePath);
         if (file_exists($diskPath)) {
-            return response()->download($diskPath, "CV-Of-{$user->name}.pdf");
-        } elseif (file_exists($pubPath)) {
-            return response()->download($pubPath, "CV-Of-{$user->name}.pdf");
+            return response()->download($diskPath, $downloadName);
+        }
+
+        // 4. Fallback: public path
+        $pubPath = public_path(ltrim($user->custom_cv, '/'));
+        if (file_exists($pubPath)) {
+            return response()->download($pubPath, $downloadName);
+        }
+
+        // 5. Fallback: resolve via media_url() helper
+        $remoteUrl = media_url($user->custom_cv);
+        if ($remoteUrl && \Illuminate\Support\Str::startsWith($remoteUrl, ['http://', 'https://'])) {
+            try {
+                $fileContent = @file_get_contents($remoteUrl);
+                if ($fileContent !== false) {
+                    return response($fileContent, 200, [
+                        'Content-Type' => 'application/pdf',
+                        'Content-Disposition' => 'attachment; filename="' . $downloadName . '"',
+                        'Content-Length' => strlen($fileContent),
+                    ]);
+                }
+            } catch (\Throwable $e) {}
+            return redirect()->away($remoteUrl);
+        }
+
+        if (request()->ajax() || request()->wantsJson()) {
+            return response()->json(['error' => 'The file was not found on the server.'], 404);
         }
 
         return redirect()->route('team', $slug)->with('error', 'The file was not found on the server.');

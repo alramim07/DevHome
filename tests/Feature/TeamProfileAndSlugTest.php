@@ -184,4 +184,78 @@ class TeamProfileAndSlugTest extends TestCase
         $response->assertSee('btn-download-custom-cv');
         $response->assertSee('data-has-custom-cv="0"', false);
     }
+
+    public function test_user_can_upload_custom_cv_via_modal_endpoint(): void
+    {
+        \Illuminate\Support\Facades\Storage::fake('public');
+
+        $user = User::factory()->create([
+            'slug' => 'cv-user',
+            'custom_cv' => null,
+        ]);
+
+        $file = \Illuminate\Http\UploadedFile::fake()->create('my_resume.pdf', 250, 'application/pdf');
+
+        $response = $this->actingAs($user)->post(route('profile.cv.update'), [
+            'custom_cv' => $file,
+        ]);
+
+        $response->assertSessionHas('success');
+        $updatedUser = $user->fresh();
+        $this->assertNotNull($updatedUser->custom_cv);
+        $this->assertStringContainsString('storage/dev_cvs/', $updatedUser->custom_cv);
+        \Illuminate\Support\Facades\Storage::disk('public')->assertExists(media_path($updatedUser->custom_cv));
+    }
+
+    public function test_custom_cv_update_validates_pdf_extension_only(): void
+    {
+        \Illuminate\Support\Facades\Storage::fake('public');
+
+        $user = User::factory()->create([
+            'slug' => 'cv-validation-user',
+        ]);
+
+        $invalidFile = \Illuminate\Http\UploadedFile::fake()->create('document.docx', 100, 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+
+        $response = $this->actingAs($user)->post(route('profile.cv.update'), [
+            'custom_cv' => $invalidFile,
+        ]);
+
+        $response->assertSessionHasErrors('custom_cv');
+    }
+
+    public function test_profile_page_shows_filename_and_update_modal_when_cv_exists(): void
+    {
+        $user = User::factory()->create([
+            'email' => 'cv-display@example.com',
+            'slug' => 'cv-display-user',
+            'custom_cv' => 'storage/dev_cvs/my_special_resume.pdf',
+        ]);
+
+        $response = $this->actingAs($user)->get(route('profile'));
+
+        $response->assertStatus(200);
+        $response->assertSee('my_special_resume.pdf');
+        $response->assertSee('Update CV');
+        $response->assertSee('id="updateCvModal"', false);
+        $response->assertSee('Allowed file extensions:');
+    }
+
+    public function test_download_custom_cv_serves_file_from_public_storage(): void
+    {
+        \Illuminate\Support\Facades\Storage::fake('public');
+
+        $user = User::factory()->create([
+            'name' => 'User Download Test',
+            'slug' => 'user-download-test',
+            'custom_cv' => 'storage/dev_cvs/resume.pdf',
+        ]);
+
+        \Illuminate\Support\Facades\Storage::disk('public')->put('dev_cvs/resume.pdf', 'dummy pdf content');
+
+        $response = $this->get(route('cv.custom', $user->slug));
+
+        $response->assertStatus(200);
+        $this->assertStringContainsString('CV-Of-user-download-test.pdf', $response->headers->get('content-disposition'));
+    }
 }

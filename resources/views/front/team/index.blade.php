@@ -248,14 +248,171 @@
 @push('scripts')
 <script>
 $(document).ready(function() {
-    function triggerDownload(url) {
-        const iframe = document.createElement('iframe');
-        iframe.style.display = 'none';
-        iframe.src = url;
-        document.body.appendChild(iframe);
-        setTimeout(function() {
-            iframe.remove();
-        }, 30000);
+    function downloadWithProgressBar(url, userName, cvType) {
+        let progressTimer = null;
+        let currentPercent = 1;
+
+        Swal.fire({
+            title: 'Downloading...',
+            html: `
+                <div class="swal-download-container" style="text-align: left; padding: 10px 4px 4px;">
+                    <div class="d-flex justify-content-between align-items-center mb-2" style="font-size: 14px;">
+                        <span style="color: #cbd5e1; font-weight: 500;">
+                            <i class="fa fa-spinner fa-spin me-1 text-primary"></i>
+                            <span id="download-status-text">Preparing ${cvType}...</span>
+                        </span>
+                        <span id="download-percentage-text" style="color: #3b82f6; font-weight: 700; font-size: 15px;">1%</span>
+                    </div>
+                    <div style="background-color: #334155; border-radius: 9999px; overflow: hidden; height: 16px; width: 100%; box-shadow: inset 0 2px 4px rgba(0,0,0,0.4);">
+                        <div id="download-progress-fill" style="background: linear-gradient(90deg, #2563eb, #06b6d4, #10b981); height: 100%; width: 1%; border-radius: 9999px; transition: width 0.15s ease-out;"></div>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mt-2 text-muted" style="font-size: 12px;">
+                        <span id="download-detail-text">Connecting to server...</span>
+                        <span>100%</span>
+                    </div>
+                </div>
+            `,
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            showConfirmButton: false,
+            showCancelButton: false,
+            background: '#1e2125',
+            color: '#fff',
+            didOpen: () => {
+                const progressBar = document.getElementById('download-progress-fill');
+                const percentText = document.getElementById('download-percentage-text');
+                const statusText = document.getElementById('download-status-text');
+                const detailText = document.getElementById('download-detail-text');
+
+                function setProgress(val, status, detail) {
+                    currentPercent = Math.min(100, Math.max(currentPercent, Math.round(val)));
+                    if (progressBar) progressBar.style.width = currentPercent + '%';
+                    if (percentText) percentText.textContent = currentPercent + '%';
+                    if (status && statusText) statusText.textContent = status;
+                    if (detail && detailText) detailText.textContent = detail;
+                }
+
+                // Smooth progressive counter while waiting for server response
+                progressTimer = setInterval(() => {
+                    if (currentPercent < 35) {
+                        currentPercent += Math.floor(Math.random() * 4) + 2;
+                        setProgress(currentPercent, `Preparing ${cvType}...`, 'Rendering document...');
+                    } else if (currentPercent < 75) {
+                        currentPercent += Math.floor(Math.random() * 3) + 1;
+                        setProgress(currentPercent, `Downloading ${cvType}...`, 'Transferring data...');
+                    } else if (currentPercent < 94) {
+                        currentPercent += 1;
+                        setProgress(currentPercent, 'Finalizing download...', 'Processing PDF stream...');
+                    }
+                }, 180);
+
+                const xhr = new XMLHttpRequest();
+                xhr.open('GET', url, true);
+                xhr.responseType = 'blob';
+
+                xhr.onprogress = function(e) {
+                    if (e.lengthComputable && e.total > 0) {
+                        const realPercent = Math.round((e.loaded / e.total) * 100);
+                        const loadedKB = (e.loaded / 1024).toFixed(0);
+                        const totalKB = (e.total / 1024).toFixed(0);
+                        setProgress(realPercent, `Downloading ${cvType}...`, `${loadedKB} KB / ${totalKB} KB`);
+                    }
+                };
+
+                xhr.onload = function() {
+                    clearInterval(progressTimer);
+
+                    if (xhr.status >= 200 && xhr.status < 300) {
+                        const blob = xhr.response;
+
+                        // Check if returned JSON error
+                        if (blob.type === 'application/json') {
+                            const reader = new FileReader();
+                            reader.onload = function() {
+                                try {
+                                    const err = JSON.parse(reader.result);
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Download Failed',
+                                        text: err.error || 'Failed to download CV.',
+                                        confirmButtonColor: '#3056d3',
+                                        background: '#1e2125',
+                                        color: '#fff',
+                                    });
+                                } catch(e) {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Download Failed',
+                                        text: 'An error occurred while downloading the CV.',
+                                        confirmButtonColor: '#3056d3',
+                                        background: '#1e2125',
+                                        color: '#fff',
+                                    });
+                                }
+                            };
+                            reader.readAsText(blob);
+                            return;
+                        }
+
+                        setProgress(100, 'Download Complete!', 'Saving file to your device...');
+
+                        // Parse filename from Content-Disposition header
+                        let filename = `CV-Of-${userName.replace(/\s+/g, '-')}.pdf`;
+                        const disposition = xhr.getResponseHeader('Content-Disposition');
+                        if (disposition && disposition.indexOf('filename=') !== -1) {
+                            const matches = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/.exec(disposition);
+                            if (matches != null && matches[1]) {
+                                filename = matches[1].replace(/['"]/g, '').trim();
+                            }
+                        }
+
+                        const blobUrl = window.URL.createObjectURL(blob);
+                        const downloadLink = document.createElement('a');
+                        downloadLink.href = blobUrl;
+                        downloadLink.download = filename;
+                        document.body.appendChild(downloadLink);
+                        downloadLink.click();
+                        downloadLink.remove();
+                        setTimeout(() => window.URL.revokeObjectURL(blobUrl), 2000);
+
+                        setTimeout(() => {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Download Complete!',
+                                text: `${cvType} for ${userName} has been downloaded successfully.`,
+                                timer: 2500,
+                                showConfirmButton: false,
+                                background: '#1e2125',
+                                color: '#fff',
+                            });
+                        }, 500);
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Download Failed',
+                            text: 'The server encountered an issue while generating or fetching the CV.',
+                            confirmButtonColor: '#3056d3',
+                            background: '#1e2125',
+                            color: '#fff',
+                        });
+                    }
+                };
+
+                xhr.onerror = function() {
+                    clearInterval(progressTimer);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Network Error',
+                        text: 'Unable to download CV. Please check your network and try again.',
+                        confirmButtonColor: '#3056d3',
+                        background: '#1e2125',
+                        color: '#fff',
+                    });
+                };
+
+                xhr.send();
+            }
+        });
     }
 
     $('.btn-download-custom-cv').on('click', function(e) {
@@ -289,7 +446,7 @@ $(document).ready(function() {
             color: '#fff',
         }).then((result) => {
             if (result.isConfirmed) {
-                triggerDownload(downloadUrl);
+                downloadWithProgressBar(downloadUrl, userName, 'Customized CV');
             }
         });
     });
@@ -312,7 +469,7 @@ $(document).ready(function() {
             color: '#fff',
         }).then((result) => {
             if (result.isConfirmed) {
-                triggerDownload(downloadUrl);
+                downloadWithProgressBar(downloadUrl, userName, 'DevHome CV');
             }
         });
     });

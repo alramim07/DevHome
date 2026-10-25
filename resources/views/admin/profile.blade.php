@@ -88,141 +88,277 @@
                     <form id="profileUpdateForm" action="{{ route('profile.update') }}" method="POST"
                         enctype="multipart/form-data">
                         @csrf
-                        <div class="card newBack">
-                            <div class="card-body">
-                                <div class="row mb-3">
-                                    <div class="col-sm-3">
-                                        <h6 class="mb-0">Full Name</h6>
-                                    </div>
-                                    <div class="col-sm-9 text-secondary">
-                                        <input type="text" name="name" class="form-control"
-                                            value="{{ $user->name }}">
-                                    </div>
+                        <div class="card newBack shadow-sm border-0">
+                            <div class="card-header border-bottom border-dark bg-transparent py-3 px-4 d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h5 class="mb-0 text-white"><i class="fa fa-user-edit text-primary me-2"></i>Edit Profile</h5>
+                                    <small class="text-muted">Manage your personal information, public profile, and account details</small>
                                 </div>
-                                <div class="row mb-3">
-                                    <div class="col-sm-3">
-                                        <h6 class="mb-0">Email</h6>
-                                    </div>
-                                    <div class="col-sm-9 text-secondary">
-                                        <input type="text" name="email" class="form-control"
-                                            value="{{ $user->email }}">
-                                    </div>
-                                </div>
-                                <div class="row mb-3">
-                                    <div class="col-sm-3">
-                                        <h6 class="mb-0">Profile Slug / URL</h6>
-                                    </div>
-                                    <div class="col-sm-9 text-secondary">
-                                        <div class="input-group">
-                                            <span class="input-group-text bg-dark text-muted border-secondary">{{ url('/team') }}/</span>
-                                            <input type="text" name="slug" class="form-control @error('slug') is-invalid @enderror"
-                                                value="{{ old('slug', $user->slug) }}" placeholder="e.g. {{ Str::slug($user->name) }}">
+                                <button type="submit" class="btn btn-primary btn-sm px-3">
+                                    <i class="fa fa-save me-1"></i> Save Changes
+                                </button>
+                            </div>
+
+                            <div class="card-body p-4">
+                                {{-- Section 1: Personal & Professional Details --}}
+                                <div class="mb-4">
+                                    <h6 class="text-primary text-uppercase font-weight-bold mb-3 small" style="letter-spacing: 0.5px;">
+                                        <i class="fa fa-id-card me-1"></i> Personal & Professional Info
+                                    </h6>
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label text-light small fw-semibold">Full Name <span class="text-danger">*</span></label>
+                                            <div class="input-group">
+                                                <span class="input-group-text bg-dark border-secondary text-muted"><i class="fa fa-user"></i></span>
+                                                <input type="text" name="name" class="form-control"
+                                                    value="{{ old('name', $user->name) }}" required>
+                                            </div>
                                         </div>
-                                        @error('slug')
-                                            <div class="text-danger small mt-1">{{ $message }}</div>
-                                        @enderror
-                                        <small class="text-muted d-block mt-1">Public URL: <code>{{ url('/team') }}/{{ $user->slug ?? Str::slug($user->name) }}</code></small>
+                                        <div class="col-md-6">
+                                            <label class="form-label text-light small fw-semibold">Email Address <span class="text-danger">*</span></label>
+                                            <div class="input-group">
+                                                <span class="input-group-text bg-dark border-secondary text-muted"><i class="fa fa-envelope"></i></span>
+                                                <input type="email" name="email" class="form-control"
+                                                    value="{{ old('email', $user->email) }}" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label text-light small fw-semibold">Designation / Role</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text bg-dark border-secondary text-muted"><i class="fa fa-briefcase"></i></span>
+                                                <input type="text" name="designation" class="form-control"
+                                                    value="{{ old('designation', $user->designation) }}" placeholder="e.g. Software Engineer">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label text-light small fw-semibold">Experience</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text bg-dark border-secondary text-muted"><i class="fa fa-clock"></i></span>
+                                                <input type="text" name="experience" class="form-control"
+                                                    value="{{ old('experience', $user->experience) }}" placeholder="e.g. 3+ Years">
+                                            </div>
+                                        </div>
+                                        <div class="col-12">
+                                            <label class="form-label text-light small fw-semibold">Public Profile Slug / URL</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text bg-dark text-muted border-secondary">{{ url('/team') }}/</span>
+                                                <input type="text" name="slug" class="form-control @error('slug') is-invalid @enderror"
+                                                    value="{{ old('slug', $user->slug) }}" placeholder="e.g. {{ Str::slug($user->name) }}">
+                                            </div>
+                                            @error('slug')
+                                                <div class="text-danger small mt-1">{{ $message }}</div>
+                                            @enderror
+                                            <small class="text-muted d-block mt-1">
+                                                <i class="fa fa-link me-1"></i> Public profile link: <code>{{ url('/team') }}/{{ $user->slug ?? Str::slug($user->name) }}</code>
+                                            </small>
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="row mb-3">
-                                    <div class="col-sm-3">
-                                        <h6 class="mb-0">Image</h6>
-                                    </div>
-                                    <div class="col-sm-9 text-secondary">
-                                        <input type="file" name="image" class="form-control" id="formFile">
-                                    </div>
-                                </div>
-                                <div class="row mb-3">
-                                    <div class="col-sm-3">
-                                        <h6 class="mb-0">Custom CV</h6>
-                                    </div>
-                                    <div class="col-sm-9 text-secondary">
-                                        <input type="file" name="custom_cv" class="form-control" id="formFile">
-                                    </div>
-                                </div>
-                                <div class="row mb-3">
-                                    <div class="col-sm-3">
-                                        <h6 class="mb-0">Designation</h6>
-                                    </div>
-                                    <div class="col-sm-9 text-secondary">
-                                        <input type="text" name="designation" class="form-control"
-                                            value="{{ $user->designation }}">
-                                    </div>
-                                </div>
-                                <div class="row mb-3">
-                                    <div class="col-sm-3">
-                                        <h6 class="mb-0">Biography</h6>
-                                    </div>
-                                    <div class="col-sm-9 text-secondary">
-                                        <textarea name="biography" class="form-control @error('biography') is-invalid @enderror" rows="3" placeholder="Brief professional biography...">{{ old('biography', $user->biography) }}</textarea>
-                                        @error('biography')
-                                            <div class="text-danger small mt-1">{{ $message }}</div>
-                                        @enderror
+
+                                <hr class="border-secondary my-4" style="opacity: 0.25;">
+
+                                {{-- Section 2: Biography & Skills --}}
+                                <div class="mb-4">
+                                    <h6 class="text-primary text-uppercase font-weight-bold mb-3 small" style="letter-spacing: 0.5px;">
+                                        <i class="fa fa-align-left me-1"></i> Biography & Skills
+                                    </h6>
+                                    <div class="row g-3">
+                                        <div class="col-12">
+                                            <label class="form-label text-light small fw-semibold">Professional Biography</label>
+                                            <textarea name="biography" class="form-control @error('biography') is-invalid @enderror" rows="3"
+                                                placeholder="Brief professional biography...">{{ old('biography', $user->biography) }}</textarea>
+                                            @error('biography')
+                                                <div class="text-danger small mt-1">{{ $message }}</div>
+                                            @enderror
+                                            <small class="text-muted">Brief overview shown on your public profile card.</small>
+                                        </div>
+                                        <div class="col-12">
+                                            <label class="form-label text-light small fw-semibold">Tech Stack / Languages</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text bg-dark border-secondary text-muted"><i class="fa fa-code"></i></span>
+                                                <input type="text" name="languages" class="form-control"
+                                                    value="{{ old('languages', is_array($user->languages) ? implode(', ', $user->languages) : $user->languages) }}"
+                                                    placeholder="e.g. PHP, Laravel, JavaScript, Vue.js, MySQL">
+                                            </div>
+                                            <small class="text-muted">Comma-separated list of technologies and skills.</small>
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="row mb-3">
-                                    <div class="col-sm-3">
-                                        <h6 class="mb-0">Facebook Url</h6>
-                                    </div>
-                                    <div class="col-sm-9 text-secondary">
-                                        <input type="text" name="facebook_url" class="form-control"
-                                            value="{{ $user->facebook_url }}">
-                                    </div>
-                                </div>
-                                <div class="row mb-3">
-                                    <div class="col-sm-3">
-                                        <h6 class="mb-0">Linkedin Url</h6>
-                                    </div>
-                                    <div class="col-sm-9 text-secondary">
-                                        <input type="text" name="linkedin_url" class="form-control"
-                                            value="{{ $user->linkedin_url }}">
-                                    </div>
-                                </div>
-                                <div class="row mb-3">
-                                    <div class="col-sm-3">
-                                        <h6 class="mb-0">Github Url</h6>
-                                    </div>
-                                    <div class="col-sm-9 text-secondary">
-                                        <input type="text" name="github_url" class="form-control"
-                                            value="{{ $user->github_url }}">
-                                    </div>
-                                </div>
-                                <div class="row mb-3">
-                                    <div class="col-sm-3">
-                                        <h6 class="mb-0">Experience</h6>
-                                    </div>
-                                    <div class="col-sm-9 text-secondary">
-                                        <input type="text" name="experience" class="form-control"
-                                            value="{{ $user->experience }}">
-                                    </div>
-                                </div>
-                                <div class="row mb-3">
-                                    <div class="col-sm-3">
-                                        <h6 class="mb-0">Languages</h6>
-                                    </div>
-                                    <div class="col-sm-9 text-secondary">
-                                        <input type="text" name="languages" class="form-control"
-                                            value="{{ is_array($user->languages) ? implode(', ', $user->languages) : $user->languages }}">
-                                    </div>
-                                </div>
-                                <div class="row mb-3">
-                                    <div class="col-sm-3">
-                                        <h6 class="mb-0">Change Password</h6>
-                                    </div>
-                                    <div class="col-sm-9 text-secondary">
-                                        <input type="password" name="password" class="form-control">
+
+                                <hr class="border-secondary my-4" style="opacity: 0.25;">
+
+                                {{-- Section 3: Media & Documents --}}
+                                <div class="mb-4">
+                                    <h6 class="text-primary text-uppercase font-weight-bold mb-3 small" style="letter-spacing: 0.5px;">
+                                        <i class="fa fa-folder-open me-1"></i> Media & Documents
+                                    </h6>
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label text-light small fw-semibold">Profile Photo</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text bg-dark border-secondary text-muted"><i class="fa fa-image"></i></span>
+                                                <input type="file" name="image" class="form-control" id="formFile" accept="image/*">
+                                            </div>
+                                            <small class="text-muted">Square image recommended (JPG, PNG).</small>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label text-light small fw-semibold">Custom CV (PDF)</label>
+                                            @if (!empty($user->custom_cv))
+                                                @php
+                                                    $cvFilename = basename(parse_url($user->custom_cv, PHP_URL_PATH) ?? $user->custom_cv);
+                                                @endphp
+                                                <div class="input-group">
+                                                    <span class="input-group-text bg-dark text-muted border-secondary">
+                                                        <i class="fa fa-file-pdf text-danger"></i>
+                                                    </span>
+                                                    <input type="text" class="form-control bg-dark text-light border-secondary" readonly
+                                                        value="{{ $cvFilename }}" title="{{ $cvFilename }}">
+                                                    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#updateCvModal">
+                                                        <i class="fa fa-upload me-1"></i> Update CV
+                                                    </button>
+                                                </div>
+                                                <small class="text-muted d-block mt-1">
+                                                    Current: <code>{{ $cvFilename }}</code> &bull; <strong>.pdf</strong> up to 10MB
+                                                </small>
+                                            @else
+                                                <div class="input-group">
+                                                    <input type="file" name="custom_cv" class="form-control @error('custom_cv') is-invalid @enderror" accept=".pdf">
+                                                    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#updateCvModal">
+                                                        <i class="fa fa-upload me-1"></i> Upload CV
+                                                    </button>
+                                                </div>
+                                                @error('custom_cv')
+                                                    <div class="text-danger small mt-1">{{ $message }}</div>
+                                                @enderror
+                                                <small class="text-muted d-block mt-1">Allowed formats: <strong>.pdf</strong> (Max 10MB)</small>
+                                            @endif
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="row pt-3">
-                                    <div class="col-sm-9 text-secondary">
-                                        <button type="submit" class="btn btn-primary">Update Profile</button>
+
+                                <hr class="border-secondary my-4" style="opacity: 0.25;">
+
+                                {{-- Section 4: Social Profiles --}}
+                                <div class="mb-4">
+                                    <h6 class="text-primary text-uppercase font-weight-bold mb-3 small" style="letter-spacing: 0.5px;">
+                                        <i class="fa fa-share-alt me-1"></i> Social Profiles
+                                    </h6>
+                                    <div class="row g-3">
+                                        <div class="col-md-4">
+                                            <label class="form-label text-light small fw-semibold">GitHub</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text bg-dark border-secondary text-light"><i class="fab fa-github"></i></span>
+                                                <input type="url" name="github_url" class="form-control"
+                                                    value="{{ old('github_url', $user->github_url) }}" placeholder="https://github.com/...">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label text-light small fw-semibold">LinkedIn</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text bg-dark border-secondary text-primary"><i class="fab fa-linkedin-in"></i></span>
+                                                <input type="url" name="linkedin_url" class="form-control"
+                                                    value="{{ old('linkedin_url', $user->linkedin_url) }}" placeholder="https://linkedin.com/in/...">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label text-light small fw-semibold">Facebook</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text bg-dark border-secondary text-info"><i class="fab fa-facebook-f"></i></span>
+                                                <input type="url" name="facebook_url" class="form-control"
+                                                    value="{{ old('facebook_url', $user->facebook_url) }}" placeholder="https://facebook.com/...">
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
+
+                                <hr class="border-secondary my-4" style="opacity: 0.25;">
+
+                                {{-- Section 5: Account Security --}}
+                                <div class="mb-2">
+                                    <h6 class="text-primary text-uppercase font-weight-bold mb-3 small" style="letter-spacing: 0.5px;">
+                                        <i class="fa fa-lock me-1"></i> Account Security
+                                    </h6>
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label text-light small fw-semibold">Change Password</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text bg-dark border-secondary text-muted"><i class="fa fa-key"></i></span>
+                                                <input type="password" name="password" class="form-control" placeholder="Leave blank to keep current">
+                                            </div>
+                                            <small class="text-muted">Only fill this if you want to set a new password.</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card-footer border-top border-dark bg-transparent py-3 px-4 d-flex justify-content-between align-items-center">
+                                <span class="text-muted small"><i class="fa fa-info-circle me-1"></i> Review your changes before saving.</span>
+                                <button type="submit" class="btn btn-primary px-4">
+                                    <i class="fa fa-save me-1"></i> Update Profile
+                                </button>
                             </div>
                         </div>
                     </form>
                 </div>
             </div>
+        </div>
+    </div>
+
+    {{-- Modal to Upload / Update Custom CV --}}
+    <div class="modal fade" id="updateCvModal" tabindex="-1" aria-labelledby="updateCvModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <form action="{{ route('profile.cv.update') }}" method="POST" enctype="multipart/form-data"
+                  class="modal-content bg-secondary text-white border-0 shadow">
+                @csrf
+                <div class="modal-header border-bottom border-dark">
+                    <h5 class="modal-title text-white d-flex align-items-center" id="updateCvModalLabel">
+                        <i class="fa fa-file-pdf text-danger me-2"></i> Update Custom CV
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    @if (!empty($user->custom_cv))
+                        @php
+                            $currentCvName = basename(parse_url($user->custom_cv, PHP_URL_PATH) ?? $user->custom_cv);
+                        @endphp
+                        <div class="mb-3 p-3 rounded bg-dark border border-secondary d-flex align-items-center justify-content-between">
+                            <div class="text-truncate me-2">
+                                <small class="text-muted d-block">Current Uploaded CV:</small>
+                                <span class="text-white small fw-bold">
+                                    <i class="fa fa-file-pdf text-danger me-1"></i>
+                                    {{ $currentCvName }}
+                                </span>
+                            </div>
+                            @if ($user->slug)
+                                <a href="{{ route('cv.custom', $user->slug) }}" class="btn btn-sm btn-outline-info" target="_blank" title="View Current CV">
+                                    <i class="fa fa-download"></i> View
+                                </a>
+                            @endif
+                        </div>
+                    @endif
+
+                    <div class="mb-3">
+                        <label class="form-label text-white fw-bold">Select New Custom CV File</label>
+                        <input type="file" name="custom_cv" class="form-control text-white bg-dark border-secondary" accept=".pdf" required>
+                    </div>
+
+                    <div class="alert alert-dark border-secondary text-light small mb-0">
+                        <div class="d-flex">
+                            <i class="fa fa-info-circle text-info me-2 mt-1"></i>
+                            <div>
+                                <div><strong>Allowed file extensions:</strong> <code>.pdf</code> only.</div>
+                                <div class="text-muted mt-1">DevHome Custom CV section currently allows <strong>PDF</strong> documents up to <strong>10 MB</strong> in size.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-top border-dark">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fa fa-upload me-1"></i> Upload & Save CV
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 @endsection
