@@ -11,7 +11,7 @@
 
 **A modern, feature-rich portfolio platform built with Laravel 12 for developers to showcase their projects, manage CVs, and build their online presence.**
 
-[🚀 Live Website](https://devhome.onrender.com) • [📖 Documentation](#documentation)
+[🚀 Live Website](https://devhome.onrender.com) • [📖 Documentation](https://github.com/alramim07/DevHome/wiki/Documentation)
 
 </div>
 
