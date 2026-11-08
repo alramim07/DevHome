@@ -625,44 +625,6 @@ CMD ["php-fpm"]
 
 ---
 
-## 🤝 Contributing
-
-### 📋 How to Contribute
-
-1. **🍴 Fork the Repository**
-2. **🌿 Create Feature Branch**
-```bash
-git checkout -b feature/amazing-feature
-```
-
-3. **💻 Commit Your Changes**
-```bash
-git commit -m 'Add amazing feature'
-```
-
-4. **📤 Push to Branch**
-```bash
-git push origin feature/amazing-feature
-```
-
-5. **🔄 Open Pull Request**
-
-### 📝 Coding Standards
-
-- Follow **PSR-12** coding standards
-- Use **Laravel Pint** for code formatting
-- Write **tests** for new features
-- Update **documentation** as needed
-
-### 🐛 Bug Reporting
-
-- Use **GitHub Issues** for bug reports
-- Include **steps to reproduce**
-- Provide **environment details**
-- Add **error logs** if available
-
----
-
 ## 🎯 Project Status
 
 > **✅ Production Ready** - DevHome is live and fully functional at [https://devhome.onrender.com](https://devhome.onrender.com) with all core features implemented and tested.
@@ -697,8 +659,6 @@ git push origin feature/amazing-feature
 
 ## 📄 License
 
-## 📄 License
-
 This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
 
 ---
@@ -707,7 +667,6 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 
 - 📧 **Email**: [sakibramim4@gmail.com](mailto:sakibramim4@gmail.com)
 - 🐛 **Issues**: [GitHub Issues](https://github.com/lynsromero/DevHome/issues)
-- 📖 **Documentation**: [Documentation](#documentation)
 
 ---
 
