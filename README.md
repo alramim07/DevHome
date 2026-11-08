@@ -4,8 +4,9 @@
 
 ![DevHome Logo](https://img.shields.io/badge/DevHome-Portfolio%20Platform-blue?style=for-the-badge)
 ![Laravel](https://img.shields.io/badge/Laravel-12.0-FF2D20?style=for-the-badge&logo=laravel)
-![PHP](https://img.shields.io/badge/PHP-8.2+-777BB4?style=for-the-badge&logo=php)
+![PHP](https://img.shields.io/badge/PHP-8.2%2B-777BB4?style=for-the-badge&logo=php)
 ![TailwindCSS](https://img.shields.io/badge/TailwindCSS-4.0-06B6D4?style=for-the-badge&logo=tailwind-css)
+![Tests](https://img.shields.io/badge/Tests-153%20Passing-brightgreen?style=for-the-badge)
 ![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
 
 **A modern, feature-rich portfolio platform built with Laravel 12 for developers to showcase their projects, manage CVs, and build their online presence.**
@@ -48,6 +49,18 @@
 - **📥 CV Download** - Generate and download professional CVs in PDF format
 - **📬 Project Contact Form** - Direct contact form on project pages
 - **🗂️ Organized View Structure** - Modular frontend layouts for better maintainability
+
+### 🏆 Key Technical Highlights
+- **🏗️ Service-Based Architecture** - Modular services (`DashboardService`, `HomeService`, `ProjectService`) for clean separation of concerns
+- **🔐 Custom RBAC System** - Built from scratch without packages: Position presets with permission inheritance, per-user overrides, Super Admin hierarchy with mutual protection
+- **🗄️ Advanced Database Design** - Soft deletes, JSON columns for flexible tech stacks/languages, polymorphic relationships ready
+- **⚡ AJAX-First Frontend** - Alpine.js + Axios for seamless SPA-like experience without SPA complexity
+- **🎨 Self-Hosted Rich Text Editor** - TinyMCE 5 (GPL) with custom image upload to Supabase S3, no external CDN dependency
+- **📄 PDF Generation Pipeline** - Browsershot + Puppeteer + Spatie PDF for server-side CV generation
+- **🔍 SEO-Ready** - Dynamic sitemap.xml, robots.txt, meta tags, semantic HTML, clean slugs
+- **🧪 Comprehensive Testing** - 153 tests (556 assertions) covering RBAC, CRUD, sitemap, security, edge cases
+- **🐳 Production-Ready** - Docker-ready, Render/Heroku compatible, Supabase S3 storage, health checks
+- **🔒 Security-First** - CSRF protection, rate limiting, mass assignment guards, XSS prevention, SQL injection prevention
 
 ### 🛡️ Admin Panel Features
 - **🔐 Granular Role-Based Access Control (RBAC)** - Position presets, customizable per-section permissions, and Super Admin hierarchy
@@ -680,24 +693,9 @@ git push origin feature/amazing-feature
 - ✅ **Robots.txt** - Auto-generated with admin paths disallowed
 - ✅ **Security Hardening** - CSRF, rate limiting, mass assignment protection, XSS prevention
 
-### 🚧 In Progress
-- 🔄 Enhanced analytics dashboard with charts
-- 🔄 Project categories and tags system
-- 🔄 Multi-language (i18n) support
-- 🔄 Email notifications for contact forms
-- 🔄 Advanced todo features (recurring tasks, priorities)
-
-### 📋 Planned Features
-- 📋 Project commenting system
-- 📋 User portfolio sharing via public links
-- 📋 Advanced search (full-text, filters)
-- 📋 REST API for external integrations
-- 📋 Mobile app companion (React Native/Flutter)
-- 📋 Real-time notifications (Laravel Echo/Pusher)
-- 📋 GitHub/GitLab integration for auto-project sync
-- 📋 Advanced analytics with charts (Chart.js)
-
 ---
+
+## 📄 License
 
 ## 📄 License
 
@@ -713,7 +711,7 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 
 ---
 
-## 📖 Documentation
+## 📖 Documentation {#documentation}
 
 ### 🔧 Quick Start
 1. **Clone & Setup**
